@@ -4,10 +4,10 @@
  * Description: Submissions of the main enquiry form (CF7 139211) that originate from
  *              mh.yesgermany.com get their notification email sent to the Maharashtra team
  *              (the same recipient list the mh site's own August forms used), with a subject
- *              that names the campaign. Nothing else changes: the lead-capture row, the CRM
- *              push and the LMS push all run exactly as before, and submissions from the main
- *              site keep their existing recipient and subject.
- * Version:     1.0.1
+ *              that names the campaign. Meta (Facebook / Instagram) leads from mh are not
+ *              emailed at all. Nothing else changes: the lead-capture row, the CRM push and
+ *              the LMS push all run exactly as before for every lead.
+ * Version:     1.2.0
  * Author:      YES Germany
  */
 
@@ -49,6 +49,34 @@ function yg_mh_mail_is_mh_submission() {
 	return false;
 }
 
+/**
+ * True when an mh submission came from a Meta (Facebook / Instagram) ad.
+ *
+ * The mh form posts `source` as the landing URL's utm_source when there is one,
+ * otherwise the page's own label. Values seen on real leads, Sep 2026: "ig",
+ * "fb" and "facebook mh" are Meta; "Google ads MH" is not.
+ *
+ * @param array|null $posted Posted form data; read from the current submission when null.
+ */
+function yg_mh_mail_is_meta_lead( $posted = null ) {
+	if ( null === $posted ) {
+		$posted = array();
+		if ( class_exists( 'WPCF7_Submission' ) && ( $submission = WPCF7_Submission::get_instance() ) ) {
+			$posted = (array) $submission->get_posted_data();
+		}
+	}
+	foreach ( array( 'source', 'utm_source' ) as $field ) {
+		$value = isset( $posted[ $field ] ) ? $posted[ $field ] : '';
+		if ( is_array( $value ) ) {
+			$value = implode( ' ', $value );
+		}
+		if ( preg_match( '/\b(fb|ig|meta|facebook|instagram|messenger|threads)\b/i', (string) $value ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
 function yg_mh_mail_subject() {
 	$source = '';
 	if ( class_exists( 'WPCF7_Submission' ) && ( $submission = WPCF7_Submission::get_instance() ) ) {
@@ -67,11 +95,18 @@ function yg_mh_mail_subject() {
  * fires before it consults this filter). Skipping mail keeps the visitor's success
  * message and thank-you redirect intact; only submissions from mh.yesgermany.com are
  * still emailed, to the recipients above.
+ *
+ * Meta leads from mh are not emailed either - agreed with the client 30 Sep 2026:
+ * they go to the lead-capture list, the CRM and the LMS only. mh leads from
+ * Google Ads are still emailed.
  */
 add_filter(
 	'wpcf7_skip_mail',
 	function ( $skip, $contact_form ) {
-		if ( $contact_form instanceof WPCF7_ContactForm && (int) $contact_form->id() === yg_mh_mail_form_id() && ! yg_mh_mail_is_mh_submission() ) {
+		if ( ! $contact_form instanceof WPCF7_ContactForm || (int) $contact_form->id() !== yg_mh_mail_form_id() ) {
+			return $skip;
+		}
+		if ( ! yg_mh_mail_is_mh_submission() || yg_mh_mail_is_meta_lead() ) {
 			return true;
 		}
 		return $skip;

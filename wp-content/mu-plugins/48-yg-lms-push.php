@@ -2,7 +2,7 @@
 /**
  * Plugin Name: YG mh Lead Delivery (CRM + LMS)
  * Description: Makes enquiries submitted from mh.yesgermany.com reach both downstream systems. The CRM push in 45-yg-lead-crm-push.php runs in the browser by default, off CF7's JS events - neither of which exists on mh - so mh leads were never reaching it; this forces that push server-side for mh only. It also forwards to the LMS lead-widget, which is a separate system from the CRM and does not receive its leads (verified 24 Sep 2026).
- * Version:     1.2.1
+ * Version:     1.4.0
  * Author:      YES Germany
  */
 
@@ -180,6 +180,15 @@ function yg_lms_field_data( array $posted ) {
  */
 function yg_lms_push( $contact_form, &$abort = null, $submission = null ) {
 	try {
+		/*
+		 * Production only, like the CRM push in 45-yg-lead-crm-push.php. The LMS
+		 * is a live system, so a test submission on staging must never reach it,
+		 * even if staging's wp-config.php is ever given the key.
+		 */
+		if ( function_exists( 'yg_is_production' ) && ! yg_is_production() ) {
+			return;
+		}
+
 		if ( ! yg_lms_is_forwarded_origin() ) {
 			return;
 		}
