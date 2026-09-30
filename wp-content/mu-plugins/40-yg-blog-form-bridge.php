@@ -2,7 +2,7 @@
 /**
  * Plugin Name: YG Blog Form Bridge
  * Description: Read-only endpoint the blog install (public_html/blog) uses to render the main site's enquiry form and keep its branch mapping in sync. Adds nothing to the main site's own pages and changes no existing behaviour.
- * Version:     1.0.0
+ * Version:     1.3.0
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -64,12 +64,59 @@ function yg_blog_form_bridge() {
 			'html'      => $html,
 			'branches'  => get_option( 'branch_selection_cf7_data' ),
 			'thank_you' => home_url( '/thank-you/' ),
+
+			/*
+			 * The CRM endpoint, for installs that must push it from the browser.
+			 * Outbound 8443 is refused from this server, so the push cannot be
+			 * made server-side from anywhere on this host - which is why the
+			 * main site does it in the visitor's browser and mh must too.
+			 */
+			'crm_url'   => function_exists( 'yg_lead_api_url' ) ? yg_lead_api_url() : '',
 			'assets'    => array(
 				'branch_js' => $branch_assets . 'branch-selection.js',
 				'ui_js'     => $branch_assets . 'frontend-ui.js',
 				'form_css'  => $branch_assets . 'frontend-style.css',
 				'cf7_css'   => plugins_url( 'includes/css/styles.css', WP_PLUGIN_DIR . '/contact-form-7/wp-contact-form-7.php' ),
+
+				/*
+				 * The searchable State / Branch dropdown. It lives in the popup
+				 * plugin because that is where it was first needed, but popup.js
+				 * enhances inline CF7 forms before it looks for the popup overlay
+				 * and returns when there is none - so an install with no popup
+				 * gets the dropdowns and nothing else. popup.css is scoped to
+				 * .yg- classes and #yg-form-popup-overlay, so none of it applies
+				 * where the overlay is absent.
+				 */
+			'select_js'  => plugins_url( 'assets/js/popup.js', WP_PLUGIN_DIR . '/yg-form-popup-v2/yg-form-popup-v2.php' ),
+			'select_css' => plugins_url( 'assets/css/popup.css', WP_PLUGIN_DIR . '/yg-form-popup-v2/yg-form-popup-v2.php' ),
 			),
 		)
 	);
 }
+
+/**
+ * Which other YES Germany installs may post this form from a browser.
+ *
+ * The blog lives under www.yesgermany.com, so its submissions are same-origin
+ * and never needed this. mh.yesgermany.com is a different origin, so without an
+ * Access-Control-Allow-Origin header the browser blocks the page from reading
+ * CF7's reply - the lead is created but the visitor sees a failure and submits
+ * again. Listing the origin here is enough: WordPress's own
+ * rest_send_cors_headers() reads this list and sends the header, including the
+ * Vary: Origin that keeps the response cacheable.
+ *
+ * Deliberately an allowlist of our own hosts, not a wildcard. Nothing is
+ * granted that a visitor on that site could not already do by hand.
+ */
+function yg_form_bridge_origins() {
+	return (array) apply_filters(
+		'yg_form_bridge_origins',
+		array(
+			'https://mh.yesgermany.com',
+		)
+	);
+}
+
+add_filter( 'allowed_http_origins', function ( $origins ) {
+	return array_values( array_unique( array_merge( (array) $origins, yg_form_bridge_origins() ) ) );
+} );
