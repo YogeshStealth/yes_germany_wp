@@ -135,10 +135,26 @@ add_action(
  * @return string 'browser' or 'server'
  */
 function yg_lead_api_transport() {
-	if ( defined( 'YG_LEAD_API_TRANSPORT' ) && 'server' === YG_LEAD_API_TRANSPORT ) {
-		return 'server';
-	}
-	return 'browser';
+	$transport = ( defined( 'YG_LEAD_API_TRANSPORT' ) && 'server' === YG_LEAD_API_TRANSPORT )
+		? 'server'
+		: 'browser';
+
+	/**
+	 * Which end makes the CRM call.
+	 *
+	 * The browser push rides on CF7's own JS events, so it only works where
+	 * CF7's script is running and the page stays open long enough. A form
+	 * embedded on another install - mh.yesgermany.com - has neither: it
+	 * submits to this site's REST endpoint from its own JavaScript, so no
+	 * wpcf7 event is ever dispatched here and this script is not on that
+	 * page. Such a submission has to be pushed server-side or it reaches
+	 * the CRM not at all.
+	 *
+	 * @param string $transport 'browser' or 'server'.
+	 */
+	$transport = apply_filters( 'yg_lead_api_transport', $transport );
+
+	return 'server' === $transport ? 'server' : 'browser';
 }
 
 /*
