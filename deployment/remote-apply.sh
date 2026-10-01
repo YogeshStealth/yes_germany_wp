@@ -118,6 +118,9 @@ say "imported"
 wp cache flush --skip-plugins --skip-themes >/dev/null 2>&1 || true
 wp litespeed-purge all --skip-themes >/dev/null 2>&1 || true
 wp elementor flush-css --skip-themes >/dev/null 2>&1 || true
+# Last: stored pages link stylesheets that the flushes above just renamed.
+wp plugin is-active cache-enabler --skip-themes >/dev/null 2>&1 \
+  && { wp cache-enabler clear --skip-themes >/dev/null 2>&1 || true; }
 say "caches flushed"
 
 say "SUCCESS"
