@@ -117,13 +117,14 @@ jobs:
             wp-content/themes/zakra-child/inc/analytics.php
             wp-content/mu-plugins/45-yg-lead-crm-push.php
             wp-content/mu-plugins/48-yg-lms-push.php
+            wp-content/mu-plugins/55-yg-lms-lead-relay.php
           )
           for path in "${paths[@]}"; do
             test -f "$path" || { echo "::error::$path is missing."; exit 1; }
             grep -q 'yg_is_production' "$path" \
               || { echo "::error file=$path::lost its production guard."; exit 1; }
           done
-          echo "Analytics, the CRM push and the LMS push are still production-gated."
+          echo "Analytics, the CRM push, the LMS push and the LMS relay are still production-gated."
 
       - name: No site-wide form listener may return
         # The CRM must be fed by completed, validated submissions only. A
