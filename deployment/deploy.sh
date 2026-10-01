@@ -111,6 +111,16 @@ wp_remote cache flush --skip-plugins --skip-themes >/dev/null 2>&1 \
 wp_remote elementor flush-css --skip-themes >/dev/null 2>&1 \
   && ok "Elementor CSS regenerated" || warn "Elementor flush unavailable"
 
+# Cache Enabler stores whole pages, and those pages link the stylesheets
+# LiteSpeed combines. The flushes above make those stylesheets get rebuilt
+# under new names and the old files deleted, so every stored page would keep
+# linking a 404 and render unstyled. On 2026-10-01 that was 95 of 99 pages.
+# Must run last. Skipped where the plugin is not active, e.g. staging.
+if wp_remote plugin is-active cache-enabler --skip-themes >/dev/null 2>&1; then
+  wp_remote cache-enabler clear --skip-themes >/dev/null 2>&1 \
+    && ok "page cache cleared" || warn "page cache clear failed"
+fi
+
 log "Deploy complete: ${RELEASE_ID}"
 echo "$RELEASE_ID" > .release-id
 if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
