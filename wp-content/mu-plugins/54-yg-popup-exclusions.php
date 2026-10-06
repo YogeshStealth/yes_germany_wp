@@ -18,6 +18,10 @@
  *   german-language-enquiry   requested 1 Oct 2026; the page has its own
  *                             demo-class form, so the popup stacked a second
  *                             form over it.
+ *   german-language-course,   requested 6 Oct 2026, same reason: each has its
+ *   german-classes-in-chennai, own "Book Free Demo Class" form.
+ *   german-language,
+ *   german-language-course-in-delhi
  *
  * Remove a slug to bring the popup back on that page.
  *
@@ -31,6 +35,10 @@ add_filter(
 	function ( $pages ) {
 		$pages   = (array) $pages;
 		$pages[] = 'german-language-enquiry';
+		$pages[] = 'german-language-course';
+		$pages[] = 'german-classes-in-chennai';
+		$pages[] = 'german-language';
+		$pages[] = 'german-language-course-in-delhi';
 		return array_values( array_unique( $pages ) );
 	}
 );
