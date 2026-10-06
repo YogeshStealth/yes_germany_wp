@@ -54,6 +54,12 @@ $shared_header = array(
 		// that one is the --z-index variable, which every container inside the header
 		// inherits, and it lifted the header's gold rule over the mobile menu panel.
 		'custom_css'    => "selector{z-index:10;}",
+		// 61435 has no background of its own (pages show white through it). The
+		// homepage keeps its branches map in a fixed, z-index 0 panel behind the
+		// page; without an opaque header it showed through at 1366x768. The old
+		// pasted header was opaque yellow, which is why that never showed before.
+		'background_background' => 'classic',
+		'background_color'      => '#FFFFFF',
 		'_title'        => 'Site header (renders ElementsKit template 61435)',
 	),
 	'elements' => array(
