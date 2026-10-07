@@ -1,0 +1,578 @@
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap">
+<style id="ygt-css">
+/* TUM page - layout from yesgermany-mumbai-page-structure-v4. Everything is
+   scoped to .ygt so the site header/footer are untouched, and sized in px:
+   this theme sets the root font size to 10px, so rem would shrink it. */
+.ygt{--ink:#12100c;--ink-2:#3a362d;--ink-3:#6e685b;--paper:#faf7f0;--card:#fff;--line:#e4ded0;
+  --gold:#f0b400;--gold-2:#c78f00;--crimson:#a6172b;--max:1180px;
+  background:var(--paper);color:var(--ink);font:400 17px/1.65 Manrope,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.ygt *{box-sizing:border-box}
+.ygt .wrap{max-width:var(--max);margin:0 auto;padding:0 22px}
+.ygt h1,.ygt h2,.ygt h3{font-family:Newsreader,Georgia,serif;font-weight:500;line-height:1.1;letter-spacing:-.015em;margin:0 0 .5em;color:var(--ink)}
+.ygt h1{font-size:clamp(34px,5vw,54px)}
+.ygt h2{font-size:clamp(27px,3.4vw,38px)}
+.ygt h3{font-size:18px;font-family:Manrope,sans-serif;font-weight:800;letter-spacing:-.005em}
+.ygt p{max-width:72ch;margin:0 0 1em;font-size:17px;line-height:1.65;color:var(--ink-2)}
+.ygt a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:3px}
+.ygt img{display:block;max-width:100%;height:auto}
+.ygt section{padding:64px 0}
+.ygt section + section{border-top:1px solid var(--line)}
+.ygt .crumbs{font-size:13.5px;color:var(--ink-3);padding:18px 0 4px}
+.ygt .crumbs a{color:var(--ink-3)}
+.ygt .btn{display:inline-block;background:var(--gold);color:var(--ink);font-weight:800;font-size:16px;line-height:1.2;
+  padding:15px 26px;border:2px solid var(--ink);border-radius:0;text-decoration:none;box-shadow:5px 5px 0 var(--ink);transition:transform .12s,box-shadow .12s}
+.ygt .btn:hover{transform:translate(2px,2px);box-shadow:3px 3px 0 var(--ink);color:var(--ink)}
+.ygt .btn.ghost{background:transparent;box-shadow:none}
+.ygt .btn.ghost:hover{background:#fff;transform:none}
+.ygt .cta-row{display:flex;flex-wrap:wrap;gap:14px;margin:26px 0 18px}
+.ygt .micro{font-size:13.5px;color:var(--ink-3)}
+/* hero */
+.ygt .hero{padding:26px 0 0}
+.ygt .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:start}
+.ygt .hero h1 .rule{display:block;width:74px;height:6px;background:var(--gold);margin-bottom:22px}
+.ygt .hero .lede{font-size:19px;color:var(--ink-2)}
+.ygt .hero-figure{margin:34px 0 0}
+.ygt .hero-figure img{width:100%;aspect-ratio:16/5;object-fit:cover;border:2px solid var(--ink)}
+.ygt .flagbar{display:flex;height:8px;border:2px solid var(--ink);border-top:0}
+.ygt .flagbar i{flex:1}.ygt .flagbar i:nth-child(1){background:var(--ink)}.ygt .flagbar i:nth-child(2){background:var(--crimson)}.ygt .flagbar i:nth-child(3){background:var(--gold)}
+.ygt .form-card{background:var(--card);border:2px solid var(--ink);box-shadow:9px 9px 0 var(--gold);padding:0;scroll-margin-top:120px}
+/* the Enquiry Form brings its own title and card; sit it flush in the frame */
+.ygt .form-card .bscf7-eligibility-form{box-shadow:none!important;border-radius:0!important;margin:0!important;border:0!important}
+.ygt .form-card .wpcf7{margin:0}
+/* trust band */
+.ygt .trust{background:var(--ink);color:#fff;padding:52px 0}
+.ygt .trust .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+.ygt .trust b{display:block;font-family:Newsreader,serif;font-size:40px;font-weight:500;color:var(--gold);line-height:1}
+.ygt .trust span{font-size:14px;color:#c9c3b3;display:block;margin-top:6px}
+/* layout helpers */
+.ygt .cols{display:grid;gap:24px;grid-template-columns:repeat(3,1fr)}
+.ygt .cols-2{display:grid;gap:24px;grid-template-columns:repeat(2,1fr)}
+.ygt .cols-4{display:grid;gap:22px;grid-template-columns:repeat(4,1fr)}
+.ygt .card{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--gold);padding:22px 22px 24px}
+.ygt .card p,.ygt .card li{font-size:15.5px;color:var(--ink-3)}
+.ygt .card p:last-child{margin-bottom:0}
+.ygt .note{background:#fff8e1;border:1px solid var(--gold);padding:16px 20px;font-size:15.5px;margin:18px 0;max-width:80ch}
+.ygt .note p{margin:0;font-size:15.5px}
+ol.ygt-steps{list-style:none;counter-reset:s;padding:0;margin:0;max-width:86ch}
+ol.ygt-steps > li{counter-increment:s;display:grid;grid-template-columns:52px 1fr;gap:18px;padding:22px 0;border-bottom:1px solid var(--line)}
+ol.ygt-steps > li::before{content:"0" counter(s);font-family:Newsreader,serif;font-size:26px;color:var(--gold-2);line-height:1.2}
+ol.ygt-steps h3{margin-bottom:6px}
+ol.ygt-steps p{margin:0 0 8px;color:var(--ink-3);font-size:15.5px}
+.ygt ul.ticks{margin:0 0 1em;padding-left:20px;max-width:72ch}
+.ygt ul.ticks li{margin:0 0 .5em;color:var(--ink-2);font-size:16px}
+.ygt .pills{display:flex;flex-wrap:wrap;gap:10px;padding:0;margin:12px 0 0;list-style:none}
+.ygt .pills li{border:1px solid var(--line);background:var(--card);padding:9px 15px;font-size:14px}
+.ygt .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:0;margin:14px 0;list-style:none}
+.ygt .flow li{background:var(--ink);color:#fff;padding:9px 14px;font-size:14px;font-weight:700}
+.ygt .flow li + li::before{content:"→";color:var(--gold);margin-right:8px}
+/* tables */
+.ygt .tbl{overflow-x:auto;margin:18px 0 10px}
+.ygt table{border-collapse:collapse;width:100%;font-size:15px;background:var(--card);border:1px solid var(--line);margin:0}
+.ygt th,.ygt td{text-align:left;padding:13px 16px;border:0;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-2)}
+.ygt thead th{background:var(--ink);color:#fff;font-size:13.5px;font-weight:700}
+.ygt tbody th{font-weight:700;color:var(--ink);width:32%}
+/* faq */
+.ygt details{border-bottom:1px solid var(--line);padding:18px 0}
+.ygt summary{cursor:pointer;font-weight:700;font-size:17px;list-style:none;display:flex;justify-content:space-between;gap:20px}
+.ygt summary::-webkit-details-marker{display:none}
+.ygt summary::after{content:"+";color:var(--gold-2);font-size:24px;line-height:1}
+.ygt details[open] summary::after{content:"–"}
+.ygt details p{margin:12px 0 0;color:var(--ink-3);max-width:80ch}
+.ygt .sources{columns:2;column-gap:40px;padding-left:20px}
+.ygt .sources li{break-inside:avoid;margin:0 0 .5em;font-size:15.5px}
+.ygt .endcta{background:var(--ink);color:#fff;text-align:center}
+.ygt .endcta h2{color:#fff}
+.ygt .endcta p{color:#c9c3b3;margin-inline:auto}
+@media (max-width:900px){
+  .ygt .hero-grid{grid-template-columns:1fr;gap:32px}
+  .ygt .cols,.ygt .cols-4{grid-template-columns:1fr 1fr}
+  .ygt .trust .grid{grid-template-columns:1fr 1fr;gap:22px}
+  .ygt section{padding:50px 0}
+}
+@media (max-width:640px){
+  .ygt .cols,.ygt .cols-2,.ygt .cols-4{grid-template-columns:1fr}
+  .ygt .btn{width:100%;text-align:center}
+  .ygt .sources{columns:1}
+  .ygt .hero-figure img{aspect-ratio:16/9}
+  .ygt p{font-size:16px}
+}
+</style>
+
+<div class="ygt">
+<div class="wrap">
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="https://www.yesgermany.com/">Home</a> › <span aria-current="page">Technical University of Munich (TUM)</span></nav>
+</div>
+
+<!-- ============ HERO ============ -->
+<div class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <h1><span class="rule"></span>Technical University of Munich (TUM), Germany: Courses, Fees, Admissions &amp; Requirements</h1>
+        <p class="lede">The Technical University of Munich (TUM) is a public research university in Germany with a strong academic focus across engineering, natural sciences, life sciences, medicine, management, and social sciences. Founded in Munich in 1868, TUM has developed into a globally connected university with campuses and study locations across Bavaria and an international presence.</p>
+        <p>For international students, TUM offers a broad selection of Bachelor's and Master's degree programmes, including programmes taught fully or predominantly in English. However, admission requirements, language requirements, application periods, and tuition fees can vary significantly from one programme to another.</p>
+        <p>For Indian students, the application process has some additional steps that should be understood before applying. Depending on the level and programme, applicants may need APS certification, a Preliminary Documentation (VPD) from Uni-Assist, and additional tests such as GRE, GATE, or GMAT.</p>
+        <p>This guide explains the Technical University of Munich courses, tuition fees, admission requirements, application process, APS and VPD requirements, scholarships, living costs, and important considerations for Indian students.</p>
+        <div class="cta-row">
+          <a class="btn" href="#eligibility">Check your eligibility</a>
+          <a class="btn ghost" href="tel:+918070606070">Call +91 80706 06070</a>
+        </div>
+      </div>
+
+      <aside class="form-card" id="eligibility" aria-label="Check your eligibility">
+        [contact-form-7 id="139211" title="Enquiry Form"]
+      </aside>
+    </div>
+
+    <figure class="hero-figure">
+      <img src="/wp-content/uploads/2023/10/The-Technical-University-of-Munich.webp" alt="Technical University of Munich, Germany" width="1600" height="500" loading="eager">
+    </figure>
+    <div class="flagbar" aria-hidden="true"><i></i><i></i><i></i></div>
+  </div>
+</div>
+
+<!-- ============ TRUST BAND ============ -->
+<section class="trust" aria-label="TUM in numbers">
+  <div class="wrap">
+    <div class="grid">
+      <div><b>51,954</b><span>Students in winter semester 2025/26</span></div>
+      <div><b>45%</b><span>International students</span></div>
+      <div><b>177</b><span>Degree programmes</span></div>
+      <div><b>~140</b><span>Student nationalities</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AT A GLANCE ============ -->
+<section id="glance">
+  <div class="wrap">
+    <h2>Technical University of Munich at a Glance</h2>
+    <div class="tbl"><table>
+      <thead><tr><th>Category</th><th>Details</th></tr></thead>
+      <tbody>
+        <tr><th>University</th><td>Technical University of Munich</td></tr>
+        <tr><th>Common abbreviation</th><td>TUM</td></tr>
+        <tr><th>Location</th><td>Munich, Germany</td></tr>
+        <tr><th>Founded</th><td>1868</td></tr>
+        <tr><th>Type</th><td>Public research university</td></tr>
+        <tr><th>Students</th><td>51,954 in winter semester 2025/26</td></tr>
+        <tr><th>International students</th><td>45% of total students</td></tr>
+        <tr><th>Degree programmes</th><td>177</td></tr>
+        <tr><th>Student nationalities</th><td>Around 140 countries</td></tr>
+        <tr><th>Main locations</th><td>Munich, Garching, Weihenstephan, Straubing, Heilbronn, and other sites</td></tr>
+        <tr><th>Bachelor's and Master's</th><td>Available</td></tr>
+        <tr><th>Study areas</th><td>Engineering, natural sciences, life sciences, medicine, management, social sciences, and more</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ============ WHY TUM ============ -->
+<section id="why-tum">
+  <div class="wrap">
+    <h2>Why Consider the Technical University of Munich?</h2>
+    <p>TUM is particularly relevant for students looking for a research-oriented university with strong links between technology, science, entrepreneurship, and industry.</p>
+    <div class="cols-2" style="margin-top:26px">
+      <div class="card">
+        <h3>A broad academic portfolio</h3>
+        <p>TUM combines technical and scientific education with research, entrepreneurship, and interdisciplinary study. Its academic portfolio extends beyond engineering to areas including management, life sciences, medicine, architecture, and social sciences.</p>
+        <p>This breadth also supports interdisciplinary study, allowing students to explore programmes that connect technical, scientific, and other academic fields.</p>
+      </div>
+      <div class="card">
+        <h3>Strong international student community</h3>
+        <p>TUM has a substantial international student population. According to its latest published figures, international students represent 45% of total enrolment, with students coming from approximately 140 countries.</p>
+        <p>For international applicants, this provides an academic environment that includes students from a wide range of national and international backgrounds.</p>
+      </div>
+      <div class="card">
+        <h3>Research and entrepreneurship</h3>
+        <p>TUM places considerable emphasis on research, innovation, and entrepreneurship. Its current published figures include seven Clusters of Excellence, 280 ERC Grants, and 115 start-ups in 2025.</p>
+        <p>For prospective students, these indicators provide context about the university's research and innovation environment. They should also examine the research groups, laboratories, curriculum, and academic opportunities associated with their chosen programme.</p>
+      </div>
+      <div class="card">
+        <h3>TUM's current ranking position</h3>
+        <p>Rankings can change each year, so they should always be identified by ranking organisation and edition. According to TUM's published 2026 information:</p>
+        <ul class="ticks">
+          <li>QS World University Rankings 2027: 25th worldwide and 1st in Germany</li>
+          <li>Times Higher Education World University Rankings 2026: 27th worldwide and 1st in Germany</li>
+          <li>Global University Employability Ranking 2026: 13th worldwide and 5th in Europe</li>
+          <li>Academic Ranking of World Universities 2026: 45th worldwide</li>
+        </ul>
+        <p>These figures represent specific ranking editions and should be treated as dated results rather than permanent characteristics of TUM.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COURSES ============ -->
+<section id="courses">
+  <div class="wrap">
+    <h2>Technical University of Munich Courses</h2>
+    <p>The Technical University of Munich (TUM) offers a broad academic portfolio across engineering, computer science, natural sciences, life sciences, medicine, management, architecture, education, and social sciences. TUM's official degree database currently lists 53 Bachelor's programmes and 115 Master's programmes, with options offered across several academic fields and locations.</p>
+    <p>For international students, the choice of programme involves more than selecting a subject. TUM programmes differ in subject, degree level, language and study location. Because admission requirements and application periods are programme-specific, students should check the individual TUM degree page before applying.</p>
+    <p>Rather than listing every programme on this page, the tables below highlight the major academic areas and representative programmes.</p>
+
+    <h3 style="margin-top:30px">TUM Bachelor's Courses</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Academic Area</th><th>Representative Bachelor's Programmes</th><th>Broad Study Focus</th></tr></thead>
+      <tbody>
+        <tr><th>Engineering and Technology</th><td>Aerospace, Civil Engineering, Engineering Science, Engineering and Materials Science, Environmental Engineering, Mechanical Engineering</td><td>Engineering systems, infrastructure, aerospace, materials, and sustainable technologies</td></tr>
+        <tr><th>Computer Science and Data</th><td>Informatics, Informatics: Games Engineering, Information Engineering, Information Systems, Bioinformatics, Management, and Data Science</td><td>Computing, information systems, data and digital technologies</td></tr>
+        <tr><th>Natural Sciences and Mathematics</th><td>Biochemistry, Chemistry, Mathematics, Physics, Chemical Biotechnology</td><td>Fundamental sciences, mathematics, chemistry, and biotechnology</td></tr>
+        <tr><th>Life Sciences, Agriculture, and Food</th><td>Agricultural Sciences and Horticultural Sciences, Bioeconomics, Brewing and Beverage Technology, Life Sciences Biology, Life Sciences Nutrition, Molecular Biotechnology</td><td>Biology, agriculture, nutrition, food, and biotechnology</td></tr>
+        <tr><th>Architecture and Earth Sciences</th><td>Architecture, Geodesy and Earth Observation, Geosciences, Land Management</td><td>Architecture, spatial systems, Earth observation, and environmental fields</td></tr>
+        <tr><th>Management and Technology</th><td>Management and Technology, Management and Data Science, Sustainable Management and Technology</td><td>Business, management, technology, data, and sustainability</td></tr>
+        <tr><th>Health, Sport, and Social Sciences</th><td>Health Science, Sport Science, Political Science and education-related programmes</td><td>Health, sport, education, and social sciences</td></tr>
+      </tbody>
+    </table></div>
+    <p class="micro">TUM's Bachelor's degree finder should be used to check the complete and current programme list, including the language and location of each programme.</p>
+
+    <h3 style="margin-top:30px">TUM Master's Courses</h3>
+    <div class="tbl"><table>
+      <thead><tr><th>Academic Area</th><th>Representative Master's Programmes</th><th>Broad Study Focus</th></tr></thead>
+      <tbody>
+        <tr><th>Engineering and Technology</th><td>Aerospace, Aerospace Engineering, Automotive Engineering, Civil Engineering, Mechanical Engineering, Materials Science and Engineering</td><td>Advanced engineering, mobility, aerospace, materials, and infrastructure</td></tr>
+        <tr><th>Computer Science, AI and Data</th><td>Informatics, Data Engineering and Analytics, Information Engineering, Robotics, Cognition, Intelligence, AI in Society</td><td>Computer science, artificial intelligence, robotics, data, and digital systems</td></tr>
+        <tr><th>Natural Sciences and Mathematics</th><td>Mathematics, Physics, Chemistry, Biochemistry, Geophysics</td><td>Advanced scientific research, mathematical modelling, and natural sciences</td></tr>
+        <tr><th>Life Sciences and Biotechnology</th><td>Agricultural Biosciences, Agrosystem Sciences, Industrial Biotechnology, Molecular Biotechnology, Nutrition, and Biomedicine</td><td>Biotechnology, agriculture, food, nutrition, and biological sciences</td></tr>
+        <tr><th>Architecture and Built Environment</th><td>Architecture, Landscape Architecture, Urbanism, Transportation Systems, Resource-efficient and Sustainable Building</td><td>Architecture, urban development, infrastructure, and sustainable construction</td></tr>
+        <tr><th>Management and Economics</th><td>Management, Management and Digital Technology, Finance and Information Management, Sustainable Management and Technology</td><td>Management, finance, technology, data, and sustainability</td></tr>
+        <tr><th>Medicine and Health</th><td>Medical Engineering, biomedical, and health-related Master's programmes</td><td>Medicine, biomedical technologies, and health sciences</td></tr>
+        <tr><th>Society and Interdisciplinary Studies</th><td>AI in Society, Political Science, Science and Technology Studies, Human Factors Engineering</td><td>Technology, society, policy, human behaviour and interdisciplinary research</td></tr>
+      </tbody>
+    </table></div>
+    <p class="micro">TUM's Master's degree finder provides the complete current programme list and allows prospective students to narrow programmes by subject, language, admission category, and location.</p>
+
+    <div class="cols-2" style="margin-top:30px">
+      <div class="card">
+        <h3>What to Check Before Choosing a TUM Course</h3>
+        <p>Before shortlisting a TUM programme, check:</p>
+        <ul class="ticks">
+          <li>Degree level and academic background</li>
+          <li>Language of instruction</li>
+          <li>Admission procedure</li>
+          <li>Application deadline</li>
+          <li>Study location</li>
+          <li>Programme-specific eligibility requirements</li>
+          <li>Tuition and semester fees</li>
+          <li>Documents required for international applicants</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Check the Official TUM Degree Database</h3>
+        <p>The official TUM degree database should be treated as the final reference when selecting a course because programmes, admission requirements, language requirements, and application periods can change.</p>
+        <p style="margin-top:16px"><a class="btn" href="https://www.tum.de/en/studies/degree-programs" target="_blank" rel="noopener">Explore TUM Bachelor's and Master's Degree Programmes</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BACHELOR'S VS MASTER'S ============ -->
+<section id="bachelors-vs-masters">
+  <div class="wrap">
+    <h2>Bachelor's vs. Master's at TUM</h2>
+    <p>The application process is not identical for Bachelor's and Master's applicants.</p>
+    <div class="cols-2" style="margin-top:22px">
+      <div class="card">
+        <h3>Bachelor's degree</h3>
+        <p>Bachelor's applicants generally need to demonstrate that their school-leaving qualification provides access to higher education in Germany.</p>
+        <p>International school qualifications are evaluated according to German admission requirements. International applicants may also need a Preliminary Documentation from Uni-Assist.</p>
+        <p>Some Bachelor's programmes use an aptitude assessment, while other programmes may have different admission procedures.</p>
+      </div>
+      <div class="card">
+        <h3>Master's degree</h3>
+        <p>Master's applicants normally need a recognised Bachelor's degree in an appropriate academic field.</p>
+        <p>TUM does not treat a Bachelor's degree as sufficient for every Master's programme automatically. The university may assess the academic content of the previous degree, including the subjects and credits completed.</p>
+        <p>Many Master's programmes use an aptitude assessment procedure, which can include an initial document-based assessment and, depending on the programme and result, an additional interview or test.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ADMISSION REQUIREMENTS ============ -->
+<section id="admission-requirements">
+  <div class="wrap">
+    <h2>TUM Admission Requirements for International Students</h2>
+    <p>One of the most important points about TUM admission is that there is no single set of requirements applicable to every degree programme.</p>
+    <p>Applicants should check the individual programme page for:</p>
+    <ul class="pills">
+      <li>Academic qualification</li><li>Subject-specific prerequisites</li><li>Language requirements</li><li>Application period</li><li>Aptitude assessment</li><li>Required tests</li><li>Documents</li><li>Tuition fees</li><li>Start semester</li>
+    </ul>
+    <div class="cols" style="margin-top:30px">
+      <div class="card">
+        <h3>Academic qualification</h3>
+        <p>For Bachelor's applicants, TUM generally assesses the higher education entrance qualification.</p>
+        <p>For Master's applicants, the relevant Bachelor's degree and its academic content are important.</p>
+        <p>A programme may require a particular academic background rather than simply accepting any Bachelor's degree.</p>
+      </div>
+      <div class="card">
+        <h3>Language requirements</h3>
+        <p>TUM programmes can be taught in German, English, or a combination of both.</p>
+        <p>Applicants must provide the language proof specified by their individual programme.</p>
+        <p>This is why students should not assume that an English-taught programme at TUM automatically has identical language requirements to another English-taught programme.</p>
+      </div>
+      <div class="card">
+        <h3>Aptitude assessment</h3>
+        <p>TUM uses different admission procedures depending on the programme. These can include:</p>
+        <ul class="ticks">
+          <li>Unrestricted admission</li>
+          <li>Aptitude assessment</li>
+          <li>Aptitude recommendation</li>
+          <li>Numerus clausus or restricted admission</li>
+          <li>Programme-specific Master's aptitude assessment</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note"><p>For Bachelor's programmes with aptitude assessment, academic grades, and subject-specific performance may be evaluated before an applicant is invited to an interview or written test, depending on the programme. For Master's programmes, TUM may evaluate Bachelor's grades and application documents in an initial stage and may then invite eligible applicants to an interview or other assessment.</p></div>
+  </div>
+</section>
+
+<!-- ============ HOW TO APPLY ============ -->
+<section id="how-to-apply">
+  <div class="wrap">
+    <h2>How to Apply to TUM from India</h2>
+    <p>The application process for studying at TUM can be understood as a sequence of steps. The exact requirements and admission procedure vary by degree programme, so applicants should always check the individual programme page before applying.</p>
+    <ol class="ygt-steps">
+      <li><div><h3>Choose your degree programme</h3>
+        <p>Start with the official TUM programme page and check the details that apply to your chosen course, including:</p>
+        <ul class="pills"><li>Degree level</li><li>Subject prerequisites</li><li>Language requirements</li><li>Location</li><li>Duration</li><li>Application period</li><li>Admission procedure</li><li>Tuition fees</li><li>Additional tests or requirements</li></ul></div></li>
+      <li><div><h3>Check your eligibility</h3>
+        <p>Review the academic and language requirements for the programme and confirm that your previous qualification meets the stated criteria.</p>
+        <p>For Indian applicants, also check whether any additional country-specific requirements apply before proceeding with the application.</p></div></li>
+      <li><div><h3>Complete VPD or other required preliminary procedures</h3>
+        <p>If your programme requires a VPD (preliminary documentation), complete the process through uni-assist before the relevant TUM application deadline.</p>
+        <p>Other country-specific procedures may also apply depending on your qualification and programme. Complete these early enough to obtain any required documentation for the TUM application or enrolment process.</p></div></li>
+      <li><div><h3>Prepare your TUMonline application</h3>
+        <p>Create your application in TUMonline and upload the documents required for your chosen degree programme.</p>
+        <p>Make sure your documents are complete, authentic, and submitted in the format specified by TUM.</p></div></li>
+      <li><div><h3>Submit the application before the deadline</h3>
+        <p>Submit your application through TUMonline within the application period specified for your programme.</p>
+        <p>TUM does not have one universal deadline for all degree programmes. Application periods can differ depending on the programme and semester of entry.</p></div></li>
+      <li><div><h3>Complete the admission procedure</h3>
+        <p>After submission, the application is reviewed according to the admission procedure for the programme. Depending on the degree, this may include:</p>
+        <ul class="pills"><li>Document-based evaluation</li><li>Aptitude assessment</li><li>Written tests</li><li>Interviews</li><li>Additional academic assessments</li></ul>
+        <p style="margin-top:12px">Follow the instructions provided through TUMonline and complete any required assessment within the specified timeframe.</p></div></li>
+      <li><div><h3>Accept the study place and enrol</h3>
+        <p>If you receive an admission offer, follow the instructions in TUMonline to accept the study place and complete the enrolment process.</p>
+        <p>This may include submitting additional documents and completing the required fee payments. Make sure all documents required specifically for your qualification and country of education are available before enrolment.</p></div></li>
+    </ol>
+    <div class="note"><p>The key point for Indian applicants is that the application itself should be treated as a programme-specific process. APS, VPD, and any additional test or document requirements should be checked separately rather than assumed to apply identically to every TUM programme.</p></div>
+  </div>
+</section>
+
+<!-- ============ DEADLINES ============ -->
+<section id="deadlines">
+  <div class="wrap">
+    <h2>TUM Application Deadlines</h2>
+    <p>There is no single TUM deadline that applies to all Bachelor's and Master's programmes.</p>
+    <p>TUM itself advises applicants to refer to the individual degree programme for the applicable application period.</p>
+    <p>For example, the Bachelor's programme in Management and Technology at the Munich campus currently lists a winter-semester application period from 15 May to 15 July.</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Master's in Informatics</th><th>Application period</th></tr></thead>
+      <tbody>
+        <tr><th>Winter semester</th><td>1 February to 31 May</td></tr>
+        <tr><th>Summer semester</th><td>1 October to 30 November</td></tr>
+      </tbody>
+    </table></div>
+    <p>Another Master's programme may have completely different dates. Therefore, students should treat the programme page as the final source for their application deadline.</p>
+  </div>
+</section>
+
+<!-- ============ TUITION ============ -->
+<section id="tuition-fees">
+  <div class="wrap">
+    <h2>TUM Tuition Fees for International Students</h2>
+    <p>This is an important change for international applicants.</p>
+    <p>TUM charges tuition fees to newly enrolled students from non-EU/EEA countries in Bachelor's and Master's degree programmes, subject to the university's stated exceptions.</p>
+    <div class="cols-2" style="margin-top:22px">
+      <div class="card">
+        <h3>For most programmes</h3>
+        <ul class="ticks">
+          <li>Bachelor's tuition is usually €2,000 or €3,000 per semester</li>
+          <li>Master's tuition is usually €4,000 or €6,000 per semester</li>
+        </ul>
+        <p>The exact amount is programme-specific. The tuition fee is in addition to the semester fee.</p>
+      </div>
+      <div class="card">
+        <h3>Example of programme-specific fees</h3>
+        <ul class="ticks">
+          <li>The Bachelor's in Management and Technology at Munich currently lists tuition of €2,000 per semester for international students from third countries.</li>
+          <li>The Master's in Informatics currently lists €6,000 per semester.</li>
+          <li>The Master's in Data Engineering and Analytics also currently lists €6,000 per semester.</li>
+        </ul>
+        <p>These examples show why students should not use a single “TUM tuition fee” figure when calculating their total cost.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:34px">TUM Semester Fee</h3>
+    <p>Students also have to pay the semester fee. TUM lists the semester fee separately from tuition. For summer semester 2026, the published amounts were:</p>
+    <div class="tbl"><table>
+      <thead><tr><th>Campus</th><th>Semester fee (summer semester 2026)</th></tr></thead>
+      <tbody>
+        <tr><th>Munich, Garching, and Weihenstephan</th><td>€97</td></tr>
+        <tr><th>Straubing</th><td>€82</td></tr>
+        <tr><th>Heilbronn</th><td>€97</td></tr>
+      </tbody>
+    </table></div>
+    <p>The amount can change, so applicants should check the current semester fee before making a payment.</p>
+  </div>
+</section>
+
+<!-- ============ SCHOLARSHIPS ============ -->
+<section id="scholarships">
+  <div class="wrap">
+    <h2>Scholarships and Financial Support at TUM</h2>
+    <p>TUM provides several forms of financial support, including scholarships and tuition-fee relief for eligible international students.</p>
+    <p>The TUM scholarship for international students provides one-time financial support of €500 to €1,800 per semester, with applications possible again in subsequent semesters subject to the scholarship rules.</p>
+    <p>The programme is not simply an admission scholarship. Eligibility depends on factors including academic performance and financial need, and specific semester requirements apply.</p>
+    <p>Students should also investigate:</p>
+    <ul class="pills"><li>TUM scholarships</li><li>Programme-specific funding</li><li>External scholarships</li><li>DAAD opportunities</li><li>Foundations and other funding organisations</li></ul>
+    <div class="note"><p>Scholarship eligibility should always be checked separately from university admission eligibility.</p></div>
+  </div>
+</section>
+
+<!-- ============ COST OF LIVING ============ -->
+<section id="cost-of-living">
+  <div class="wrap">
+    <h2>Cost of Living in Munich</h2>
+    <p>Tuition is only one part of the financial planning required for studying at TUM.</p>
+    <p>Munich is one of Germany's more expensive student locations. TUM's current general guidance estimates approximately €1,300 to €2,000 per month for a single-person household in the greater Munich area, although actual spending varies according to accommodation, lifestyle, and personal circumstances.</p>
+    <div class="cols-2" style="margin-top:22px">
+      <div class="card">
+        <h3>Typical expenses include</h3>
+        <ul class="ticks">
+          <li>Accommodation</li><li>Food</li><li>Health insurance</li><li>Transportation</li><li>Phone and internet</li><li>Study materials</li><li>Personal expenses</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Accommodation in Munich</h3>
+        <p>Accommodation should be planned early. TUM does not operate its own residence halls. Many student residences are operated by the Munich Student Union and other organisations.</p>
+        <p>Demand for affordable student housing is high, and TUM advises students to start their accommodation search early. Students can consider:</p>
+        <ul class="ticks">
+          <li>Student residence halls</li><li>Shared apartments</li><li>Private rooms</li><li>Private apartments</li><li>Temporary accommodation during the initial period</li>
+        </ul>
+        <p>Do not assume that admission to TUM automatically provides accommodation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CAMPUSES ============ -->
+<section id="campuses">
+  <div class="wrap">
+    <h2>TUM Campuses and Study Locations</h2>
+    <p>TUM is not located only in central Munich.</p>
+    <div class="cols" style="margin-top:22px">
+      <div class="card"><h3>Munich</h3><p>The Munich campus is TUM's historic home and includes several schools and departments in the city centre.</p><p>The main address is: Arcisstraße 21, 80333 Munich, Germany</p></div>
+      <div class="card"><h3>Garching</h3><p>Garching is TUM's largest campus and an important centre for natural sciences and engineering. It is particularly relevant to students in fields connected with computer science, mathematics, engineering, natural sciences, and research-intensive disciplines.</p></div>
+      <div class="card"><h3>Weihenstephan</h3><p>The Weihenstephan campus in Freising is strongly associated with life sciences and related fields.</p></div>
+      <div class="card"><h3>Straubing</h3><p>TUM Campus Straubing focuses on biotechnology, sustainability, and interdisciplinary areas connecting science, technology, and economics.</p></div>
+      <div class="card"><h3>Heilbronn</h3><p>The Heilbronn campus focuses on areas at the interface of management, computer science and technology.</p></div>
+      <div class="card"><h3>Ottobrunn-Taufkirchen</h3><p>This location is associated with aerospace and geodesy.</p></div>
+      <div class="card"><h3>Singapore</h3><p>TUM's international campus in Singapore is home to TUM Asia, which offers selected TUM degree programmes in engineering and natural sciences. Singapore is also home to TUMCREATE, a TUM research platform. Students should check TUM Asia separately because its programmes and admission requirements differ from those of TUM programmes based in Germany.</p></div>
+    </div>
+    <p style="margin-top:22px">The exact campus depends on the degree programme, so students should always check the location listed on their programme page.</p>
+  </div>
+</section>
+
+<!-- ============ INDIAN STUDENTS ============ -->
+<section id="indian-students">
+  <div class="wrap">
+    <h2>What Makes the TUM Application Different for Indian Students?</h2>
+    <p>Indian applicants to the Technical University of Munich may need to complete additional country-specific requirements alongside the regular TUM application. These can include APS verification, a VPD through Uni-Assist, and programme-specific GRE, GATE, or GMAT requirements.</p>
+    <p>The exact requirements depend on the applicant's academic background and chosen degree programme. Applicants should therefore check both TUM's country-specific requirements and the requirements of their individual programme.</p>
+    <div class="cols-2" style="margin-top:22px">
+      <div class="card"><h3>APS Certificate</h3><p>Applicants with Indian school or university qualifications generally need an APS certificate for admission to a German university, subject to TUM's stated exceptions.</p><p>APS, or the Academic Evaluation Center, verifies academic documents and educational qualifications from India. The applicable requirements can differ according to the applicant's academic background.</p></div>
+      <div class="card"><h3>VPD Through Uni-Assist</h3><p>Indian applicants to Bachelor's and Master's programmes generally need to obtain a Preliminary Documentation (VPD) through Uni-Assist, in addition to applying directly to TUM.</p><p>A VPD is not the TUM application. After receiving the VPD, applicants still need to submit their application through TUMonline and provide the required VPD documentation.</p></div>
+      <div class="card"><h3>Documents for Indian Bachelor's Applicants</h3><p>For the VPD process, TUM lists documents that can include:</p><ul class="ticks"><li>School certificate</li><li>University entrance examination results</li><li>School transcript</li><li>APS certificate</li></ul><p>The exact documents depend on the applicant's educational background.</p></div>
+      <div class="card"><h3>Documents for Indian Master's Applicants</h3><p>For Master's applicants, documents can include:</p><ul class="ticks"><li>University diploma</li><li>Transcript of Records</li><li>APS certificate</li></ul><p>Individual Master's programmes may require additional documents.</p></div>
+      <div class="card"><h3>GRE and GATE Requirements</h3><p>GRE or GATE is not required for every TUM Master's programme. Certain programmes require applicants from India to submit a current GRE or GATE result, with the applicable requirements determined by the programme.</p><p>For some programmes, graduates of an Indian Institute of Technology may be permitted to submit their IIT transcript instead of a separate GATE document where the programme's requirements allow this.</p></div>
+      <div class="card"><h3>GMAT Requirements for Selected Programmes</h3><p>Some TUM School of Management Master's programmes have additional requirements for applicants with Bachelor's degrees from India.</p><p>For example, the Master's in Management and Technology specifies a GMAT requirement for applicants with a Bachelor's degree from India. This requirement should not be generalised to other TUM Master's programmes.</p></div>
+    </div>
+    <h3 style="margin-top:34px">What Indian Applicants Should Keep in Mind</h3>
+    <p>The Indian application pathway can therefore involve several separate stages:</p>
+    <ul class="flow">
+      <li>Academic eligibility</li><li>APS requirements</li><li>VPD through Uni-Assist, where required</li><li>TUMonline application</li><li>Programme-specific assessment</li><li>Admission</li><li>Enrolment</li>
+    </ul>
+    <p>Not every applicant will follow exactly the same pathway. The programme's individual requirements determine which documents, tests, and assessment steps apply.</p>
+  </div>
+</section>
+
+<!-- ============ CHECKLIST ============ -->
+<section id="checklist">
+  <div class="wrap">
+    <h2>TUM Application Checklist for Indian Students</h2>
+    <p>Before submitting your application, check the following:</p>
+    <div class="cols-4" style="margin-top:22px">
+      <div class="card"><h3>Academic</h3><ul class="ticks"><li>Is your previous qualification recognised?</li><li>Does your Bachelor's degree match the Master's subject requirements?</li><li>Do you meet the required subject-specific credits?</li><li>Do you meet the programme's grade or academic requirements?</li></ul></div>
+      <div class="card"><h3>Documents</h3><ul class="ticks"><li>Passport</li><li>Academic certificates</li><li>Transcripts</li><li>APS certificate where required</li><li>VPD where required</li><li>Curriculum or module descriptions where required</li><li>Language certificate where required</li><li>CV</li><li>Motivation letter or other programme-specific documents</li></ul></div>
+      <div class="card"><h3>Tests</h3><ul class="ticks"><li>GRE if required</li><li>GATE where accepted or required</li><li>GMAT for applicable management programmes</li><li>Any programme-specific assessment</li></ul></div>
+      <div class="card"><h3>Application</h3><ul class="ticks"><li>Check the exact programme deadline</li><li>Complete the Uni-Assist VPD process where required</li><li>Complete the TUMonline application</li><li>Upload authentic documents</li><li>Monitor the application status</li><li>Complete enrollment after admission</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section id="faq">
+  <div class="wrap">
+    <h2>Frequently Asked Questions</h2>
+    <details open><summary>Is the Technical University of Munich a public university?</summary><p>Yes. TUM is a public research university in Germany.</p></details>
+    <details><summary>Does TUM offer English-taught programmes?</summary><p>Some TUM programmes are taught entirely in English, while others are taught in German or combine German and English. The language of instruction is programme-specific.</p></details>
+    <details><summary>Is accommodation provided by TUM?</summary><p>TUM does not operate its own student residence halls. Students need to arrange accommodation through student residences or the private housing market.</p></details>
+    <details><summary>Can I apply to more than one TUM programme?</summary><p>Yes. You can apply to multiple TUM programmes, but you must submit a separate application for each programme.</p></details>
+    <details><summary>Does TUM offer summer-semester admission?</summary><p>Yes, some TUM programmes accept applications for the summer semester. The available intake and deadline depend on the individual programme.</p></details>
+    <details><summary>Do I need German if my TUM programme is taught in English?</summary><p>Not necessarily. TUM has programmes taught in English, German, or both, so check the language requirements of your chosen programme.</p></details>
+    <details><summary>Can Indian students work while studying at TUM?</summary><p>Yes. International students can generally work in Germany subject to the conditions and limits of their residence status.</p></details>
+    <details><summary>Does TUM have campuses outside Munich?</summary><p>Yes. TUM has study and research locations, including Garching, Weihenstephan, Straubing, Heilbronn, Ottobrunn-Taufkirchen, and Singapore, depending on the programme.</p></details>
+    <details><summary>Can I use the same requirements for every TUM Master's programme?</summary><p>No. Master's programmes can have different academic, language, aptitude assessment, and additional test requirements.</p></details>
+    <details><summary>Does TUM offer scholarships to international students?</summary><p>Yes. TUM offers scholarships for eligible international students, while additional funding opportunities may also be available through external organisations.</p></details>
+  </div>
+</section>
+
+<!-- ============ FINAL THOUGHTS + SOURCES ============ -->
+<section id="final-thoughts">
+  <div class="wrap">
+    <h2>Final Thoughts on Studying at the Technical University of Munich</h2>
+    <p>TUM offers a wide range of Bachelor's and Master's programmes across technical, scientific, management, and interdisciplinary fields. For international applicants, the key is to evaluate the individual programme rather than relying on university-wide assumptions about eligibility, language, deadlines, or fees. Indian applicants should also plan country-specific documentation early, particularly where APS, VPD, or additional programme requirements apply.</p>
+    <h3 style="margin-top:30px">Official sources</h3>
+    <ul class="sources">
+      <li><a href="https://www.tum.de/en/studies/degree-programs" target="_blank" rel="noopener">TUM degree programmes</a></li>
+      <li><a href="https://www.tum.de/en/studies/application" target="_blank" rel="noopener">TUM international applicants</a></li>
+      <li><a href="https://www.tum.de/en/studies/application/admission-procedures" target="_blank" rel="noopener">TUM admission procedures</a></li>
+      <li><a href="https://www.tum.de/en/studies/application/application-info-portal" target="_blank" rel="noopener">TUM India-specific requirements and APS information</a></li>
+      <li><a href="https://www.tum.de/en/studies/application/application-info-portal/uni-assist" target="_blank" rel="noopener">TUM uni-assist/VPD information</a></li>
+      <li><a href="https://www.tum.de/en/studies/fees" target="_blank" rel="noopener">TUM tuition fees for non-EU students</a></li>
+      <li><a href="https://www.tum.de/en/studies/fees-and-financial-aid" target="_blank" rel="noopener">TUM semester fees and costs</a></li>
+      <li><a href="https://www.tum.de/en/studies/fees-and-financial-aid/scholarships" target="_blank" rel="noopener">TUM scholarships for international students</a></li>
+      <li><a href="https://www.tum.de/en/about-tum/locations" target="_blank" rel="noopener">TUM campus locations</a></li>
+      <li><a href="https://www.tum.de/en/about-tum/our-university/facts-and-figures/" target="_blank" rel="noopener">TUM facts and figures</a></li>
+      <li><a href="https://www.tum.de/en/about-tum/our-university/rankings" target="_blank" rel="noopener">TUM rankings</a></li>
+      <li><a href="https://www.uni-assist.de/en/" target="_blank" rel="noopener">Uni-assist VPD information</a></li>
+      <li><a href="https://aps-india.de/" target="_blank" rel="noopener">APS India official website and checklists</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="endcta">
+  <div class="wrap">
+    <h2>Planning to apply to TUM?</h2>
+    <p>Get a free profile evaluation from YES Germany: programme shortlisting, APS, VPD, documents and your TUMonline application, planned around your intake.</p>
+    <div class="cta-row" style="justify-content:center"><a class="btn" href="#eligibility">Check your eligibility</a></div>
+  </div>
+</section>
+</div>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Is the Technical University of Munich a public university?","acceptedAnswer":{"@type":"Answer","text":"Yes. TUM is a public research university in Germany."}},
+{"@type":"Question","name":"Does TUM offer English-taught programmes?","acceptedAnswer":{"@type":"Answer","text":"Some TUM programmes are taught entirely in English, while others are taught in German or combine German and English. The language of instruction is programme-specific."}},
+{"@type":"Question","name":"Is accommodation provided by TUM?","acceptedAnswer":{"@type":"Answer","text":"TUM does not operate its own student residence halls. Students need to arrange accommodation through student residences or the private housing market."}},
+{"@type":"Question","name":"Can I apply to more than one TUM programme?","acceptedAnswer":{"@type":"Answer","text":"Yes. You can apply to multiple TUM programmes, but you must submit a separate application for each programme."}},
+{"@type":"Question","name":"Does TUM offer summer-semester admission?","acceptedAnswer":{"@type":"Answer","text":"Yes, some TUM programmes accept applications for the summer semester. The available intake and deadline depend on the individual programme."}},
+{"@type":"Question","name":"Do I need German if my TUM programme is taught in English?","acceptedAnswer":{"@type":"Answer","text":"Not necessarily. TUM has programmes taught in English, German, or both, so check the language requirements of your chosen programme."}},
+{"@type":"Question","name":"Can Indian students work while studying at TUM?","acceptedAnswer":{"@type":"Answer","text":"Yes. International students can generally work in Germany subject to the conditions and limits of their residence status."}},
+{"@type":"Question","name":"Does TUM have campuses outside Munich?","acceptedAnswer":{"@type":"Answer","text":"Yes. TUM has study and research locations, including Garching, Weihenstephan, Straubing, Heilbronn, Ottobrunn-Taufkirchen, and Singapore, depending on the programme."}},
+{"@type":"Question","name":"Can I use the same requirements for every TUM Master's programme?","acceptedAnswer":{"@type":"Answer","text":"No. Master's programmes can have different academic, language, aptitude assessment, and additional test requirements."}},
+{"@type":"Question","name":"Does TUM offer scholarships to international students?","acceptedAnswer":{"@type":"Answer","text":"Yes. TUM offers scholarships for eligible international students, while additional funding opportunities may also be available through external organisations."}}
+]}
+</script>
