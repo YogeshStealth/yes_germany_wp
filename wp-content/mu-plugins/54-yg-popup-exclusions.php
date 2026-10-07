@@ -24,6 +24,8 @@
  *   german-language-course-in-delhi
  *   technical-university-of-munich-in-germany   requested 7 Oct 2026; the page
  *                             has the Enquiry Form in its hero.
+ *   technical-university-of-berlin-in-germany,          same layout, added
+ *   ludwig-maximilian-university-of-munich-in-germany   7 Oct 2026.
  *
  * Also, without listing them: every German-language page built from the
  * hand-made demo-class designs - the pages mu-plugin 56 gives a 16px base. Each
@@ -48,6 +50,8 @@ add_filter(
 		$pages[] = 'german-language';
 		$pages[] = 'german-language-course-in-delhi';
 		$pages[] = 'technical-university-of-munich-in-germany';
+		$pages[] = 'technical-university-of-berlin-in-germany';
+		$pages[] = 'ludwig-maximilian-university-of-munich-in-germany';
 
 		// German pages in the demo-class designs (see mu-plugin 56).
 		if ( function_exists( 'yg_rem_base_applies' ) && yg_rem_base_applies() ) {
