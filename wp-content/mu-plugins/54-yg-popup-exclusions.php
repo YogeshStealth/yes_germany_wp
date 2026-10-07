@@ -23,6 +23,12 @@
  *   german-language,
  *   german-language-course-in-delhi
  *
+ * Also, without listing them: every German-language page built from the
+ * hand-made demo-class designs - the pages mu-plugin 56 gives a 16px base. Each
+ * carries its own "Book Free Demo Class" form, so the popup would stack a
+ * second form over it (Chandigarh, Bangalore, Mumbai, Pune, Hyderabad and
+ * /german-language-classes/ were the first caught this way, 7 Oct 2026).
+ *
  * Remove a slug to bring the popup back on that page.
  *
  * @package YesGermany
@@ -39,6 +45,11 @@ add_filter(
 		$pages[] = 'german-classes-in-chennai';
 		$pages[] = 'german-language';
 		$pages[] = 'german-language-course-in-delhi';
+
+		// German pages in the demo-class designs (see mu-plugin 56).
+		if ( function_exists( 'yg_rem_base_applies' ) && yg_rem_base_applies() ) {
+			$pages[] = (int) get_queried_object_id();
+		}
 		return array_values( array_unique( $pages ) );
 	}
 );
