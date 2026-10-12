@@ -2,7 +2,7 @@
 /**
  * Plugin Name: YG Lead LMS Check & Backfill
  * Description: Checks every recent www lead in the YES Germany LMS itself (search by phone, then email) and pushes the ones that are not there through the LMS lead-widget API. Run by the system cron every hour via `wp yg-lms-backfill`. Production only.
- * Version:     2.0.0
+ * Version:     2.1.0
  * Author:      Stealth Digital
  *
  * Why
@@ -217,6 +217,23 @@ function yg_lms_backfill_candidates( $limit, $hours = YG_LMS_CHECK_HOURS ) {
 function yg_lms_backfill_payload( array $lead ) {
 	$posted = json_decode( (string) $lead['fields_json'], true );
 	$posted = is_array( $posted ) ? $posted : array();
+
+	/*
+	 * The CF7 form's hidden `source` field is always "website", and the widget
+	 * API files the lead under whatever `source` says - so 78 ChatGPT / Google
+	 * Ads leads pushed on 2026-10-10 landed as "website". Send the real
+	 * channel instead: the UTM source, as the website-form API would.
+	 */
+	$utm = isset( $posted['utm_source'] ) ? trim( (string) ( is_array( $posted['utm_source'] ) ? reset( $posted['utm_source'] ) : $posted['utm_source'] ) ) : '';
+	if ( '' === $utm && ! empty( $lead['f_utm_source'] ) ) {
+		$utm = trim( (string) $lead['f_utm_source'] );
+	}
+	if ( '' === $utm && ! empty( $lead['c_utm_source'] ) ) {
+		$utm = trim( (string) $lead['c_utm_source'] );
+	}
+	if ( '' !== $utm ) {
+		$posted['source'] = $utm;
+	}
 
 	$ist = gmdate( 'Y-m-d H:i', strtotime( $lead['created_at'] . ' UTC' ) + 19800 );
 
