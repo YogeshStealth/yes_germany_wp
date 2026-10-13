@@ -2,7 +2,7 @@
 /**
  * Plugin Name: YG Lead LMS Check & Backfill
  * Description: Checks every recent www lead in the YES Germany LMS itself (search by phone, then email) and pushes the ones that are not there through the LMS lead-widget API. Run by the system cron every 6 hours via `wp yg-lms-backfill`. Production only.
- * Version:     3.1.0
+ * Version:     3.2.0
  * Author:      Stealth Digital
  *
  * Why
@@ -46,6 +46,10 @@
  * Without the constant the job behaves exactly as 2.1.
  *
  * 3.1.0 - resends use the page URL's UTMs (2026-10-13), like mu-plugin 45 2.1.
+ *
+ * 3.2.0 - German-language leads are held (2026-10-13): they go from MongoDB to a
+ * separate LMS, so they are never pushed into this one; the job only makes sure
+ * saveDetails has them. YG_LMS_BACKFILL_HOLD_GERMAN = false undoes this.
  *
  * Cron (yesgermanycom's crontab) - every 6 hours, server time is IST:
  *   17 0,6,12,18 * * * cd ~/public_html && /usr/local/bin/php ~/bin/wp yg-lms-backfill --skip-themes >> ~/yg-cron/lms-backfill.log 2>&1
@@ -280,6 +284,26 @@ function yg_lms_backfill_via_crm() {
 }
 
 /**
+ * German-language leads (level "German Language" / "German Language & IELTS")
+ * go from MongoDB to a separate LMS, not this one, so the job never pushes
+ * them into this LMS - it only makes sure saveDetails has them. Held, not
+ * dropped: a lead stays a candidate for YG_LMS_CHECK_HOURS, so defining
+ * YG_LMS_BACKFILL_HOLD_GERMAN as false in wp-config.php pushes them again.
+ *
+ * @param array $lead Row from yg_leads.
+ * @return bool
+ */
+function yg_lms_backfill_is_held_german( array $lead ) {
+	if ( defined( 'YG_LMS_BACKFILL_HOLD_GERMAN' ) && ! YG_LMS_BACKFILL_HOLD_GERMAN ) {
+		return false;
+	}
+	$posted = json_decode( (string) $lead['fields_json'], true );
+	$level  = is_array( $posted ) && isset( $posted['level_of_education'] ) ? $posted['level_of_education'] : '';
+	$level  = is_array( $level ) ? implode( ' ', array_filter( $level, 'is_scalar' ) ) : (string) $level;
+	return false !== stripos( $level, 'German Language' );
+}
+
+/**
  * Rebuild, from the stored lead, the payload the page would have sent: the
  * visitor's own fields, the browser attribution the form carried, and the
  * original submission time.
@@ -361,7 +385,7 @@ function yg_lms_backfill_crm_step( array $lead ) {
  */
 function yg_lms_backfill_run( $dry_run = false, $limit = YG_LMS_BACKFILL_BATCH, $hours = YG_LMS_CHECK_HOURS, $out = null ) {
 	$out     = $out ? $out : function ( $line ) {};
-	$summary = array( 'checked' => 0, 'in_lms' => 0, 'missing' => 0, 'sent_crm' => 0, 'crm_failed' => 0, 'waiting' => 0, 'pushed' => 0, 'push_failed' => 0, 'search_failed' => 0 );
+	$summary = array( 'checked' => 0, 'in_lms' => 0, 'missing' => 0, 'sent_crm' => 0, 'crm_failed' => 0, 'waiting' => 0, 'pushed' => 0, 'push_failed' => 0, 'search_failed' => 0, 'held_german' => 0 );
 
 	if ( ! function_exists( 'yg_is_production' ) || ! yg_is_production() ) {
 		$out( 'not production - nothing is checked or sent from this site' );
@@ -390,6 +414,24 @@ function yg_lms_backfill_run( $dry_run = false, $limit = YG_LMS_BACKFILL_BATCH, 
 
 	foreach ( yg_lms_backfill_candidates( $limit, $hours ) as $lead ) {
 		$summary['checked']++;
+
+		if ( yg_lms_backfill_via_crm() && yg_lms_backfill_is_held_german( $lead ) ) {
+			if ( 'send' !== yg_lms_backfill_crm_step( $lead ) ) {
+				$summary['held_german']++;
+				$out( sprintf( 'GERMAN   lead %d  %s  in MongoDB (saveDetails) - goes to the German-language LMS, not pushed here', $lead['id'], $lead['name'] ) );
+				continue;
+			}
+			if ( $dry_run ) {
+				$out( sprintf( 'GERMAN   lead %d  %s  saveDetails has not accepted it -> next step: send to saveDetails', $lead['id'], $lead['name'] ) );
+				continue;
+			}
+			$r = yg_lead_api_send( yg_lead_crm_payload_from_lead( $lead ), array( 'transport' => 'auto-backfill-crm', 'lead_id' => (int) $lead['id'] ) );
+			$summary[ $r['ok'] ? 'sent_crm' : 'crm_failed' ]++;
+			$out( sprintf( 'SENT TO saveDetails  lead %d (German)  %s  HTTP %d  %s', $lead['id'], $lead['name'], $r['code'], $r['ok'] ? $r['crm_lead_id'] : 'FAILED ' . substr( $r['body'], 0, 150 ) ) );
+			sleep( 1 );
+			continue;
+		}
+
 		$found = yg_lms_find_lead( $lead );
 		usleep( 200000 );
 
@@ -523,7 +565,7 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			);
 			WP_CLI::log(
 				sprintf(
-					'[%s UTC] %s: %d checked, %d in LMS, %d missing, %d sent to saveDetails, %d saveDetails failed, %d waiting for sync, %d pushed to LMS, %d push failed, %d search failed%s',
+					'[%s UTC] %s: %d checked, %d in LMS, %d missing, %d sent to saveDetails, %d saveDetails failed, %d waiting for sync, %d pushed to LMS, %d push failed, %d search failed, %d German held (in MongoDB)%s',
 					gmdate( 'Y-m-d H:i:s' ),
 					$dry ? 'dry run' : 'run',
 					$s['checked'],
@@ -535,6 +577,7 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 					$s['pushed'],
 					$s['push_failed'],
 					$s['search_failed'],
+					$s['held_german'],
 					yg_lms_backfill_via_crm() ? '' : ' [saveDetails-first is OFF]'
 				)
 			);
