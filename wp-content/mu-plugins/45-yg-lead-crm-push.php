@@ -5,7 +5,7 @@
  *              validated form submission. Replaces the site-wide JavaScript
  *              submit listener that posted every form, including half-filled
  *              ones, and unhooks it if it is still present in the theme.
- * Version:     2.1.0
+ * Version:     2.1.1
  * Author:      Stealth Digital
  *
  * Why this is a must-use plugin and not theme code
@@ -64,6 +64,12 @@
  * UTMs (or none). Fixed at the source (Cache Enabler "excluded query strings"
  * = /.+/ on live), and here: when the submitting page's URL carries UTMs,
  * those are what the CRM gets.
+ *
+ * 2.1.1 - Elementor phone fields are found by their placeholder (2026-10-13)
+ * ------------------------------------------------------------------------
+ * The live Elementor forms have no label on the phone field, only the
+ * placeholder "Phone Number". The browser script read placeholders; the
+ * server path did not, so the lead went to saveDetails without a phone.
  *
  * Elementor Pro forms
  * -------------------
@@ -1033,6 +1039,20 @@ function yg_lead_elementor_record( $record, $handler = null ) {
 			return;
 		}
 
+		/*
+		 * Placeholders, by field id. The live forms label their phone field
+		 * only with the placeholder "Phone Number" (type text or number, no
+		 * label), which the record's fields do not carry - without this the
+		 * lead reached saveDetails with no phone and never got a crm_lead_id.
+		 */
+		$placeholders = array();
+		$settings_all = method_exists( $record, 'get_form_settings' ) ? $record->get_form_settings( 'form_fields' ) : array();
+		foreach ( (array) $settings_all as $setting ) {
+			if ( is_array( $setting ) && ! empty( $setting['custom_id'] ) ) {
+				$placeholders[ (string) $setting['custom_id'] ] = isset( $setting['placeholder'] ) ? (string) $setting['placeholder'] : '';
+			}
+		}
+
 		$posted = array();
 		foreach ( $fields as $id => $field ) {
 			$value = isset( $field['value'] ) ? $field['value'] : '';
@@ -1044,19 +1064,20 @@ function yg_lead_elementor_record( $record, $handler = null ) {
 			/*
 			 * Elementor names most fields field_<hash>, which tells the leads
 			 * table nothing. Copy the value to the name the table reads, using
-			 * the field's own type and label to decide which it is. The
-			 * original key is kept, so nothing is lost.
+			 * the field's own type, label and placeholder to decide which it
+			 * is. The original key is kept, so nothing is lost.
 			 */
 			$type  = isset( $field['type'] ) ? (string) $field['type'] : '';
 			$title = isset( $field['title'] ) ? (string) $field['title'] : '';
+			$hint  = $title . ' ' . $id . ' ' . ( isset( $placeholders[ (string) $id ] ) ? $placeholders[ (string) $id ] : '' );
 
 			if ( ( 'email' === $type || 'email' === $id ) && empty( $posted['email'] ) ) {
 				$posted['email'] = $posted[ (string) $id ];
 			}
-			if ( ( 'tel' === $type || preg_match( '/phone|mobile|contact number/i', $title . ' ' . $id ) ) && empty( $posted['phone'] ) ) {
+			if ( ( 'tel' === $type || preg_match( '/phone|mobile|contact number/i', $hint ) ) && empty( $posted['phone'] ) ) {
 				$posted['phone'] = $posted[ (string) $id ];
 			}
-			if ( ( 'name' === $id || preg_match( '/full name|your name/i', $title ) ) && empty( $posted['full_name'] ) ) {
+			if ( ( 'name' === $id || preg_match( '/full name|your name/i', $hint ) ) && empty( $posted['full_name'] ) ) {
 				$posted['full_name'] = $posted[ (string) $id ];
 			}
 		}
