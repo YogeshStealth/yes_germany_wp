@@ -5,7 +5,7 @@
  *              validated form submission. Replaces the site-wide JavaScript
  *              submit listener that posted every form, including half-filled
  *              ones, and unhooks it if it is still present in the theme.
- * Version:     2.0.0
+ * Version:     2.1.0
  * Author:      Stealth Digital
  *
  * Why this is a must-use plugin and not theme code
@@ -55,6 +55,15 @@
  * - yg_lead_api_send() returns the result, so the hourly job (mu-plugin 59)
  *   can resend a stored lead through the same code.
  * Turning it on: define( 'YG_LEAD_API_TRANSPORT', 'server' ); in wp-config.php.
+ *
+ * 2.1.0 - utm_* follow the page URL (2026-10-13)
+ * ----------------------------------------------
+ * Cache Enabler only checked the START of the query string, so every URL that
+ * began with utm_ or gclid was served from - and saved into - the plain page
+ * cache, hidden utm_* values included. Visitors got the previous visitor's
+ * UTMs (or none). Fixed at the source (Cache Enabler "excluded query strings"
+ * = /.+/ on live), and here: when the submitting page's URL carries UTMs,
+ * those are what the CRM gets.
  *
  * Elementor Pro forms
  * -------------------
@@ -792,7 +801,39 @@ function yg_lead_api_payload( $submission, $form_id, $form_title ) {
 	$payload['yg_session_active']  = isset( $browser['yg_session_active'] ) ? $browser['yg_session_active'] : '';
 	$payload['yg_landing_page']    = $attr['landing_page'];
 
-	return $payload;
+	return yg_lead_api_utm_from_url( $payload, $payload['tracking_url'] );
+}
+
+/**
+ * Make utm_* match the page the visitor submitted on.
+ *
+ * The form's hidden utm_* fields are filled from the URL when the page is
+ * rendered (CF7 `default:get`). A page cache that leaves utm_* out of its
+ * cache key serves one visitor's values to the next: from 24 Sep to 13 Oct
+ * 2026 ChatGPT-ad visitors on /german-education-consultant/ were sent as
+ * Google-Ads and back. When the submitting page's URL carries UTMs, those
+ * win; when it has none, the form's values are kept.
+ *
+ * @param array  $payload  Lead payload.
+ * @param string $page_url URL the form was submitted from, with its query string.
+ * @return array
+ */
+function yg_lead_api_utm_from_url( array $payload, $page_url ) {
+	$query = (string) wp_parse_url( (string) $page_url, PHP_URL_QUERY );
+	if ( '' === $query ) {
+		return $payload;
+	}
+	parse_str( $query, $params );
+
+	$keys = array( 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content' );
+	$url  = array();
+	foreach ( $keys as $key ) {
+		$url[ $key ] = isset( $params[ $key ] ) && is_scalar( $params[ $key ] ) ? sanitize_text_field( (string) $params[ $key ] ) : '';
+	}
+	if ( '' === implode( '', $url ) ) {
+		return $payload;
+	}
+	return array_merge( $payload, $url );
 }
 
 /**
@@ -1070,7 +1111,7 @@ function yg_lead_elementor_record( $record, $handler = null ) {
 		$payload['yg_referral_url']   = ! empty( $browser['yg_referral_url'] ) ? $browser['yg_referral_url'] : $attr['referrer'];
 		$payload['yg_session_active'] = isset( $browser['yg_session_active'] ) ? $browser['yg_session_active'] : '';
 
-		yg_lead_api_send( $payload );
+		yg_lead_api_send( yg_lead_api_utm_from_url( $payload, $payload['tracking_url'] ) );
 	} catch ( \Throwable $e ) {
 		yg_lead_api_log( 'elementor: ' . $e->getMessage(), array() );
 	}

@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: YG Lead LMS Check & Backfill
- * Description: Checks every recent www lead in the YES Germany LMS itself (search by phone, then email) and pushes the ones that are not there through the LMS lead-widget API. Run by the system cron every hour via `wp yg-lms-backfill`. Production only.
- * Version:     3.0.0
+ * Description: Checks every recent www lead in the YES Germany LMS itself (search by phone, then email) and pushes the ones that are not there through the LMS lead-widget API. Run by the system cron every 6 hours via `wp yg-lms-backfill`. Production only.
+ * Version:     3.1.0
  * Author:      Stealth Digital
  *
  * Why
@@ -45,8 +45,10 @@
  *      MongoDB by then, so nothing is skipped).
  * Without the constant the job behaves exactly as 2.1.
  *
- * Cron (yesgermanycom's crontab):
- *   17 * * * * cd ~/public_html && /usr/local/bin/php ~/bin/wp yg-lms-backfill --skip-themes >> ~/yg-cron/lms-backfill.log 2>&1
+ * 3.1.0 - resends use the page URL's UTMs (2026-10-13), like mu-plugin 45 2.1.
+ *
+ * Cron (yesgermanycom's crontab) - every 6 hours, server time is IST:
+ *   17 0,6,12,18 * * * cd ~/public_html && /usr/local/bin/php ~/bin/wp yg-lms-backfill --skip-themes >> ~/yg-cron/lms-backfill.log 2>&1
  * By hand: `wp yg-lms-backfill --dry-run [--hours=72]`.
  */
 
@@ -230,6 +232,9 @@ function yg_lms_backfill_candidates( $limit, $hours = YG_LMS_CHECK_HOURS ) {
 function yg_lms_backfill_payload( array $lead ) {
 	$posted = json_decode( (string) $lead['fields_json'], true );
 	$posted = is_array( $posted ) ? $posted : array();
+	if ( function_exists( 'yg_lead_api_utm_from_url' ) ) {
+		$posted = yg_lead_api_utm_from_url( $posted, ! empty( $posted['yg_tracking_url'] ) ? (string) $posted['yg_tracking_url'] : (string) $lead['page_url'] );
+	}
 
 	/*
 	 * The CF7 form's hidden `source` field is always "website", and the widget
@@ -317,7 +322,7 @@ function yg_lead_crm_payload_from_lead( array $lead ) {
 	$payload['yg_landing_page']   = (string) $lead['landing_page'];
 	$payload['resubmitted_at']    = gmdate( 'c' );
 
-	return $payload;
+	return function_exists( 'yg_lead_api_utm_from_url' ) ? yg_lead_api_utm_from_url( $payload, $payload['tracking_url'] ) : $payload;
 }
 
 /**
