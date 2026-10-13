@@ -2,7 +2,7 @@
 /**
  * Plugin Name: YG Lead LMS Check & Backfill
  * Description: Checks every recent www lead in the YES Germany LMS itself (search by phone, then email) and pushes the ones that are not there through the LMS lead-widget API. Run by the system cron every hour via `wp yg-lms-backfill`. Production only.
- * Version:     2.1.0
+ * Version:     3.0.0
  * Author:      Stealth Digital
  *
  * Why
@@ -31,6 +31,19 @@
  *
  * mh leads are email-only (mu-plugin 58) and Dubai leads go through the relay
  * (55), so only www leads are checked.
+ *
+ * 3.0.0 - missing leads go to saveDetails first (2026-10-13)
+ * -------------------------------------------------------
+ * Pushing straight to the LMS skipped the client's MongoDB, which is fed by
+ * saveDetails (yesgermany.org:8443/websiteForm/saveDetails). With
+ * YG_LMS_BACKFILL_VIA_CRM true in wp-config.php a lead missing from the LMS is:
+ *   1. sent to saveDetails with the visitor's original fields and attribution
+ *      (transport auto-backfill-crm, up to 4 tries);
+ *   2. if saveDetails accepted it - now or at submit time - but it is still not
+ *      in the LMS 2 hours later, the client's MongoDB -> LMS sync has dropped
+ *      it, and only then is it pushed to the LMS lead-widget (it is already in
+ *      MongoDB by then, so nothing is skipped).
+ * Without the constant the job behaves exactly as 2.1.
  *
  * Cron (yesgermanycom's crontab):
  *   17 * * * * cd ~/public_html && /usr/local/bin/php ~/bin/wp yg-lms-backfill --skip-themes >> ~/yg-cron/lms-backfill.log 2>&1
@@ -248,6 +261,87 @@ function yg_lms_backfill_payload( array $lead ) {
 }
 
 /* ----------------------------------------------------------------------------
+ * saveDetails (client's MongoDB) first
+ * ------------------------------------------------------------------------- */
+
+/**
+ * Whether missing leads go to saveDetails before the LMS.
+ *
+ * @return bool
+ */
+function yg_lms_backfill_via_crm() {
+	return defined( 'YG_LMS_BACKFILL_VIA_CRM' ) && YG_LMS_BACKFILL_VIA_CRM
+		&& function_exists( 'yg_lead_api_send' ) && function_exists( 'yg_lead_browser_values' );
+}
+
+/**
+ * Rebuild, from the stored lead, the payload the page would have sent: the
+ * visitor's own fields, the browser attribution the form carried, and the
+ * original submission time.
+ *
+ * @param array $lead Row from yg_leads.
+ * @return array
+ */
+function yg_lead_crm_payload_from_lead( array $lead ) {
+	$posted  = json_decode( (string) $lead['fields_json'], true );
+	$posted  = is_array( $posted ) ? $posted : array();
+	$browser = yg_lead_browser_values( $posted );
+	$skip    = '/^_wpcf7|^_wpnonce|(^|[_-])(pass|passwd|password|pwd|token|nonce|captcha|cvv|iban|card|cardnumber)([_-]|$)/i';
+
+	$payload = array();
+	foreach ( $posted as $key => $value ) {
+		if ( preg_match( $skip, (string) $key ) ) {
+			continue;
+		}
+		if ( is_array( $value ) ) {
+			$value = implode( ', ', array_filter( $value, 'is_scalar' ) );
+		}
+		if ( ! is_scalar( $value ) ) {
+			continue;
+		}
+		$payload[ $key ] = (string) $value;
+	}
+
+	$page = (string) $lead['page_url'];
+
+	$payload['form_id']           = (int) $lead['form_id'];
+	$payload['form_title']        = (string) $lead['form_title'];
+	$payload['tracking_url']      = ! empty( $browser['yg_tracking_url'] ) ? $browser['yg_tracking_url'] : $page;
+	$payload['page_title']        = ! empty( $browser['yg_page_title'] ) ? $browser['yg_page_title'] : ( function_exists( 'yg_lead_api_page_title' ) ? yg_lead_api_page_title( $page ) : '' );
+	$payload['referrer']          = array_key_exists( 'yg_referrer', $browser ) ? $browser['yg_referrer'] : (string) $lead['referrer'];
+	$payload['user_agent']        = (string) $lead['user_agent'];
+	$payload['remote_ip']         = (string) $lead['ip'];
+	$payload['timestamp']         = gmdate( 'c', strtotime( $lead['created_at'] . ' UTC' ) );
+	$payload['yg_referral_url']   = ! empty( $browser['yg_referral_url'] ) ? $browser['yg_referral_url'] : (string) $lead['landing_page'];
+	$payload['yg_session_active'] = isset( $browser['yg_session_active'] ) ? $browser['yg_session_active'] : '';
+	$payload['yg_landing_page']   = (string) $lead['landing_page'];
+	$payload['resubmitted_at']    = gmdate( 'c' );
+
+	return $payload;
+}
+
+/**
+ * What to do with a lead that is not in the LMS.
+ *
+ * @param array $lead Row from yg_leads.
+ * @return string 'send' (to saveDetails), 'wait' (saveDetails took it; give the sync time), 'lms' (push to the LMS widget)
+ */
+function yg_lms_backfill_crm_step( array $lead ) {
+	global $wpdb;
+	$log = $wpdb->prefix . 'yg_lead_api_log';
+
+	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name only.
+	$accepted = $wpdb->get_var( $wpdb->prepare( "SELECT MAX(created_at) FROM $log WHERE lead_id = %d AND channel = 'crm' AND ok = 1", (int) $lead['id'] ) );
+	$tries    = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $log WHERE lead_id = %d AND channel = 'crm' AND transport = 'auto-backfill-crm'", (int) $lead['id'] ) );
+	// phpcs:enable
+
+	if ( $accepted ) {
+		return ( time() - strtotime( $accepted . ' UTC' ) ) >= 2 * HOUR_IN_SECONDS ? 'lms' : 'wait';
+	}
+	return $tries < YG_LMS_BACKFILL_MAX_TRIES ? 'send' : 'lms';
+}
+
+/* ----------------------------------------------------------------------------
  * Run
  * ------------------------------------------------------------------------- */
 
@@ -262,7 +356,7 @@ function yg_lms_backfill_payload( array $lead ) {
  */
 function yg_lms_backfill_run( $dry_run = false, $limit = YG_LMS_BACKFILL_BATCH, $hours = YG_LMS_CHECK_HOURS, $out = null ) {
 	$out     = $out ? $out : function ( $line ) {};
-	$summary = array( 'checked' => 0, 'in_lms' => 0, 'missing' => 0, 'pushed' => 0, 'push_failed' => 0, 'search_failed' => 0 );
+	$summary = array( 'checked' => 0, 'in_lms' => 0, 'missing' => 0, 'sent_crm' => 0, 'crm_failed' => 0, 'waiting' => 0, 'pushed' => 0, 'push_failed' => 0, 'search_failed' => 0 );
 
 	if ( ! function_exists( 'yg_is_production' ) || ! yg_is_production() ) {
 		$out( 'not production - nothing is checked or sent from this site' );
@@ -320,8 +414,24 @@ function yg_lms_backfill_run( $dry_run = false, $limit = YG_LMS_BACKFILL_BATCH, 
 		}
 
 		$summary['missing']++;
+		$step = yg_lms_backfill_via_crm() ? yg_lms_backfill_crm_step( $lead ) : 'lms';
+
 		if ( $dry_run ) {
-			$out( sprintf( 'MISSING  lead %d  %s UTC  %s  %s', $lead['id'], $lead['created_at'], $lead['name'], $lead['phone'] ) );
+			$out( sprintf( 'MISSING  lead %d  %s UTC  %s  %s  -> next step: %s', $lead['id'], $lead['created_at'], $lead['name'], $lead['phone'], 'send' === $step ? 'send to saveDetails' : ( 'wait' === $step ? 'wait for the MongoDB->LMS sync' : 'push to LMS widget' ) ) );
+			continue;
+		}
+
+		if ( 'wait' === $step ) {
+			$summary['waiting']++;
+			$out( sprintf( 'WAITING  lead %d  %s  saveDetails accepted it; not in the LMS yet', $lead['id'], $lead['name'] ) );
+			continue;
+		}
+
+		if ( 'send' === $step ) {
+			$r = yg_lead_api_send( yg_lead_crm_payload_from_lead( $lead ), array( 'transport' => 'auto-backfill-crm', 'lead_id' => (int) $lead['id'] ) );
+			$summary[ $r['ok'] ? 'sent_crm' : 'crm_failed' ]++;
+			$out( sprintf( 'SENT TO saveDetails  lead %d  %s  HTTP %d  %s', $lead['id'], $lead['name'], $r['code'], $r['ok'] ? $r['crm_lead_id'] : 'FAILED ' . substr( $r['body'], 0, 150 ) ) );
+			sleep( 1 );
 			continue;
 		}
 
@@ -408,15 +518,19 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 			);
 			WP_CLI::log(
 				sprintf(
-					'[%s UTC] %s: %d checked, %d in LMS, %d missing, %d pushed, %d push failed, %d search failed',
+					'[%s UTC] %s: %d checked, %d in LMS, %d missing, %d sent to saveDetails, %d saveDetails failed, %d waiting for sync, %d pushed to LMS, %d push failed, %d search failed%s',
 					gmdate( 'Y-m-d H:i:s' ),
 					$dry ? 'dry run' : 'run',
 					$s['checked'],
 					$s['in_lms'],
 					$s['missing'],
+					$s['sent_crm'],
+					$s['crm_failed'],
+					$s['waiting'],
 					$s['pushed'],
 					$s['push_failed'],
-					$s['search_failed']
+					$s['search_failed'],
+					yg_lms_backfill_via_crm() ? '' : ' [saveDetails-first is OFF]'
 				)
 			);
 		}
