@@ -288,7 +288,7 @@ function yg_lead_attribution_script() {
 			var forms = document.querySelectorAll( 'form.wpcf7-form, form.elementor-form' );
 			for ( var i = 0; i < forms.length; i++ ) { fill( forms[ i ] ); }
 		}
-		document.addEventListener( 'submit', function ( e ) {
+		document.addEventListener( 'submit', function ( e ) { // ci-allow: fills hidden fields only, never sends a lead
 			var f = e.target;
 			if ( f && f.matches && f.matches( 'form.wpcf7-form, form.elementor-form' ) ) { fill( f ); }
 		}, true );
