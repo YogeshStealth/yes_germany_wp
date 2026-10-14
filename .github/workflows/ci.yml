@@ -137,8 +137,11 @@ jobs:
         # sends them once Elementor reports success.
         run: |
           set -euo pipefail
+          # A listener that only fills hidden fields (and never sends a lead)
+          # is allowed when its line carries the marker "ci-allow: fills hidden fields only".
           if grep -rn "document\.addEventListener( *[\"']submit" \
-               wp-content/themes/zakra-child wp-content/mu-plugins; then
+               wp-content/themes/zakra-child wp-content/mu-plugins \
+             | grep -v "ci-allow: fills hidden fields only"; then
             echo "::error::A site-wide submit listener is back. Bind to CF7's wpcf7submit event or to one form."
             exit 1
           fi
