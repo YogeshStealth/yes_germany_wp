@@ -2,7 +2,7 @@
 /**
  * Plugin Name: YG Lead LMS Check & Backfill
  * Description: Checks every recent www lead in the YES Germany LMS itself (search by phone, then email) and pushes the ones that are not there through the LMS lead-widget API. Run by the system cron every 6 hours via `wp yg-lms-backfill`. Production only.
- * Version:     3.2.0
+ * Version:     3.3.0
  * Author:      Stealth Digital
  *
  * Why
@@ -50,6 +50,10 @@
  * 3.2.0 - German-language leads are held (2026-10-13): they go from MongoDB to a
  * separate LMS, so they are never pushed into this one; the job only makes sure
  * saveDetails has them. YG_LMS_BACKFILL_HOLD_GERMAN = false undoes this.
+ *
+ * 3.3.0 - a lead found in the LMS still goes to saveDetails if saveDetails never
+ * accepted it (2026-10-14): lead 2074 timed out on saveDetails, was found in the
+ * LMS through another channel, and so never reached MongoDB.
  *
  * Cron (yesgermanycom's crontab) - every 6 hours, server time is IST:
  *   17 0,6,12,18 * * * cd ~/public_html && /usr/local/bin/php ~/bin/wp yg-lms-backfill --skip-themes >> ~/yg-cron/lms-backfill.log 2>&1
@@ -207,7 +211,10 @@ function yg_lms_backfill_candidates( $limit, $hours = YG_LMS_CHECK_HOURS ) {
 			   AND l.page_url NOT LIKE %s
 			   AND IFNULL(l.referrer, '') NOT LIKE %s
 			   AND IFNULL(l.landing_page, '') NOT LIKE %s
-			   AND NOT EXISTS ( SELECT 1 FROM $log a WHERE a.lead_id = l.id AND a.channel = 'lms' AND a.ok = 1 )
+			   AND ( NOT EXISTS ( SELECT 1 FROM $log a WHERE a.lead_id = l.id AND a.channel = 'lms' AND a.ok = 1 )
+			         OR ( %d = 1
+			              AND NOT EXISTS ( SELECT 1 FROM $log c WHERE c.lead_id = l.id AND c.channel = 'crm' AND c.ok = 1 )
+			              AND ( SELECT COUNT(*) FROM $log t WHERE t.lead_id = l.id AND t.transport = 'auto-backfill-crm' ) < %d ) )
 			   AND ( SELECT COUNT(*) FROM $log b WHERE b.lead_id = l.id AND b.transport = 'auto-backfill' ) < %d
 			 ORDER BY l.id
 			 LIMIT %d",
@@ -218,6 +225,8 @@ function yg_lms_backfill_candidates( $limit, $hours = YG_LMS_CHECK_HOURS ) {
 			'%/wp-json/%',
 			'%mh.yesgermany.com%',
 			'%mh.yesgermany.com%',
+			yg_lms_backfill_via_crm() ? 1 : 0,
+			YG_LMS_BACKFILL_MAX_TRIES,
 			YG_LMS_BACKFILL_MAX_TRIES,
 			(int) $limit
 		),
@@ -301,6 +310,21 @@ function yg_lms_backfill_is_held_german( array $lead ) {
 	$level  = is_array( $posted ) && isset( $posted['level_of_education'] ) ? $posted['level_of_education'] : '';
 	$level  = is_array( $level ) ? implode( ' ', array_filter( $level, 'is_scalar' ) ) : (string) $level;
 	return false !== stripos( $level, 'German Language' );
+}
+
+/**
+ * Send a stored lead to saveDetails (transport auto-backfill-crm).
+ *
+ * @param array    $lead    Row from yg_leads.
+ * @param array    $summary Run counters.
+ * @param callable $out     Line printer.
+ * @param string   $why     Shown in the log line.
+ */
+function yg_lms_backfill_send_crm( array $lead, array &$summary, $out, $why ) {
+	$r = yg_lead_api_send( yg_lead_crm_payload_from_lead( $lead ), array( 'transport' => 'auto-backfill-crm', 'lead_id' => (int) $lead['id'] ) );
+	$summary[ $r['ok'] ? 'sent_crm' : 'crm_failed' ]++;
+	$out( sprintf( 'SENT TO saveDetails  lead %d (%s)  %s  HTTP %d  %s', $lead['id'], $why, $lead['name'], $r['code'], $r['ok'] ? $r['crm_lead_id'] : 'FAILED ' . substr( $r['body'], 0, 150 ) ) );
+	sleep( 1 );
 }
 
 /**
@@ -425,10 +449,24 @@ function yg_lms_backfill_run( $dry_run = false, $limit = YG_LMS_BACKFILL_BATCH, 
 				$out( sprintf( 'GERMAN   lead %d  %s  saveDetails has not accepted it -> next step: send to saveDetails', $lead['id'], $lead['name'] ) );
 				continue;
 			}
-			$r = yg_lead_api_send( yg_lead_crm_payload_from_lead( $lead ), array( 'transport' => 'auto-backfill-crm', 'lead_id' => (int) $lead['id'] ) );
-			$summary[ $r['ok'] ? 'sent_crm' : 'crm_failed' ]++;
-			$out( sprintf( 'SENT TO saveDetails  lead %d (German)  %s  HTTP %d  %s', $lead['id'], $lead['name'], $r['code'], $r['ok'] ? $r['crm_lead_id'] : 'FAILED ' . substr( $r['body'], 0, 150 ) ) );
-			sleep( 1 );
+			yg_lms_backfill_send_crm( $lead, $summary, $out, 'German' );
+			continue;
+		}
+
+		/*
+		 * Already confirmed in the LMS (it came in another way, e.g. a call),
+		 * but saveDetails never accepted it: MongoDB still needs it.
+		 */
+		global $wpdb;
+		$verified = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM {$wpdb->prefix}yg_lead_api_log WHERE lead_id = %d AND channel = 'lms' AND ok = 1", (int) $lead['id'] ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		if ( $verified ) {
+			if ( yg_lms_backfill_via_crm() && 'send' === yg_lms_backfill_crm_step( $lead ) ) {
+				if ( $dry_run ) {
+					$out( sprintf( 'NOT IN MongoDB  lead %d  %s  in the LMS, but saveDetails never accepted it -> next step: send to saveDetails', $lead['id'], $lead['name'] ) );
+				} else {
+					yg_lms_backfill_send_crm( $lead, $summary, $out, 'in LMS, not in MongoDB' );
+				}
+			}
 			continue;
 		}
 
@@ -456,6 +494,13 @@ function yg_lms_backfill_run( $dry_run = false, $limit = YG_LMS_BACKFILL_BATCH, 
 						'page_url'    => $lead['page_url'],
 					)
 				);
+			}
+			if ( yg_lms_backfill_via_crm() && 'send' === yg_lms_backfill_crm_step( $lead ) ) {
+				if ( $dry_run ) {
+					$out( sprintf( 'NOT IN MongoDB  lead %d  %s  in the LMS, but saveDetails never accepted it -> next step: send to saveDetails', $lead['id'], $lead['name'] ) );
+				} else {
+					yg_lms_backfill_send_crm( $lead, $summary, $out, 'in LMS, not in MongoDB' );
+				}
 			}
 			continue;
 		}
