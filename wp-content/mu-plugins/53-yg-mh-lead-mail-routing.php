@@ -7,7 +7,7 @@
  *              that names the campaign. Meta (Facebook / Instagram) leads from mh are not
  *              emailed at all. Nothing else changes: the lead-capture row, the CRM push and
  *              the LMS push all run exactly as before for every lead.
- * Version:     1.2.0
+ * Version:     1.3.0
  * Author:      YES Germany
  */
 
@@ -132,8 +132,55 @@ add_filter(
 			$components['recipient'] = implode( ', ', $recipients );
 		}
 		$components['subject']   = yg_mh_mail_subject();
+		$components['body']      = yg_mh_mail_add_ad_details( (string) $components['body'] );
 		return $components;
 	},
 	20,
 	3
 );
+
+/**
+ * Add the ad click details to an mh lead email (1.3.0, 2026-10-14).
+ *
+ * Several Maharashtra ads carry no UTM tags, so the email's utm_ lines were
+ * empty and nobody could tell which campaign a lead came from. The mh form
+ * (yg-mh-enquiry 1.4.0) now sends Google's campaign ID and click ID, Facebook's
+ * click ID and the visitor's first landing page; they are listed here. The
+ * Google campaign ID can be searched in Google Ads to find the campaign.
+ *
+ * @param string $body Mail body as composed by CF7 (HTML).
+ * @return string
+ */
+function yg_mh_mail_add_ad_details( $body ) {
+	if ( ! class_exists( 'WPCF7_Submission' ) || ! ( $submission = WPCF7_Submission::get_instance() ) ) {
+		return $body;
+	}
+	$posted = (array) $submission->get_posted_data();
+	$get    = function ( $key ) use ( $posted ) {
+		$v = isset( $posted[ $key ] ) ? $posted[ $key ] : '';
+		return trim( (string) ( is_array( $v ) ? reset( $v ) : $v ) );
+	};
+	$rows = array(
+		'Google Ads campaign ID'      => $get( 'yg_gad_campaignid' ),
+		'Google Ads click ID'         => $get( 'yg_gclid' ),
+		'Facebook / Instagram click ID' => $get( 'yg_fbclid' ),
+		'First landing page'          => $get( 'yg_first_landing' ),
+		'Came to the site from'       => $get( 'yg_first_referrer' ),
+		'Enquiry page'                => $get( 'yg_page_url' ),
+	);
+	$lines = array();
+	foreach ( $rows as $label => $value ) {
+		if ( '' !== $value ) {
+			$lines[] = esc_html( $label ) . ': ' . esc_html( $value );
+		}
+	}
+	if ( ! $rows['Google Ads campaign ID'] && ! $rows['Google Ads click ID'] && ! $rows['Facebook / Instagram click ID'] && '' === $get( 'utm_source' ) ) {
+		array_unshift( $lines, 'No campaign or ad click information came with this visitor.' );
+	}
+	if ( ! $lines ) {
+		return $body;
+	}
+	$block = '<p>--- Ad click ---<br>' . implode( '<br>', $lines ) . '</p>';
+	$pos   = stripos( $body, '</body>' );
+	return false === $pos ? $body . $block : substr( $body, 0, $pos ) . $block . substr( $body, $pos );
+}
