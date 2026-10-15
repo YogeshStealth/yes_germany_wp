@@ -213,6 +213,35 @@ assert_environment() {
 }
 
 # ---------------------------------------------------------------------------
+# What a deploy puts on the server, as "md5  path" lines (paths relative to the
+# document root, sorted). The build side uses the same exclusions as the tar in
+# transfer_paths, so both lists describe the same set of files.
+# ---------------------------------------------------------------------------
+build_sums() {
+  local p existing=()
+  for p in "${MANAGED_PATHS[@]}"; do [[ -e "$p" ]] && existing+=("$p"); done
+  find "${existing[@]}" -type f ! -name '*.map' ! -path '*/node_modules/*' \
+       ! -path '*/.git/*' ! -path '*/.svn/*' ! -path '*/.hg/*' -print0 \
+    | LC_ALL=C sort -z | xargs -0 -r md5sum
+}
+
+live_sums() {
+  remote "cd '${REMOTE_ROOT}' && for p in $(printf '%s ' "${MANAGED_PATHS[@]}"); do [ -e \"\$p\" ] && find \"\$p\" -type f ! -name '*.map' ! -path '*/node_modules/*' ! -path '*/.git/*' ! -path '*/.svn/*' ! -path '*/.hg/*' -print0; done | LC_ALL=C sort -z | xargs -0 -r md5sum"
+}
+
+# Checksums of what the last deploy (or rollback) left on live. Kept next to
+# the document root, never inside it.
+live_manifest_path() {
+  echo "$(dirname "${REMOTE_ROOT%/}")/.yg-live-manifest"
+}
+
+write_live_manifest() {
+  local m
+  m="$(live_manifest_path)"
+  live_sums | remote "cat > '${m}.tmp' && mv '${m}.tmp' '${m}'"
+}
+
+# ---------------------------------------------------------------------------
 # Transfer a set of paths to the remote, honouring rsync availability
 # ---------------------------------------------------------------------------
 transfer_paths() {

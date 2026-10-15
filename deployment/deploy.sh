@@ -29,6 +29,9 @@ for p in "${MANAGED_PATHS[@]}"; do
 done
 ok "${#MANAGED_PATHS[@]} managed path(s) present"
 
+# Nothing changed on live since the last deploy may be lost (production only).
+bash "${SCRIPT_DIR}/check-live-drift.sh" "$ENVIRONMENT"
+
 RELEASE_ID="$(date -u +%Y-%m-%d-%H%M%S)-${GITHUB_SHA:0:7}"
 REMOTE_TMP="${REMOTE_ROOT}/.deploy-${RELEASE_ID}"
 
@@ -86,6 +89,12 @@ ok "release ${RELEASE_ID} active"
 
 # Record where the previous copy went, so rollback.sh can find it.
 remote "echo '${REMOTE_TMP}' > '${REMOTE_ROOT}/.last-release-backout'" 2>/dev/null || true
+
+# What is on live now, for the next deploy's drift check.
+if [[ "$ENVIRONMENT" == "production" ]]; then
+  write_live_manifest && ok "deploy manifest written: $(live_manifest_path)" \
+    || warn "could not write the deploy manifest - the next deploy compares live with its build only"
+fi
 
 # ---------------------------------------------------------------------------
 # 4. Post-deploy

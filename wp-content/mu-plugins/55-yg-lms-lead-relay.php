@@ -5,8 +5,9 @@
  *              straight to the LMS lead-widget from the visitor's browser, with the
  *              LMS API key in the page source. Those forms now post to
  *              /wp-json/yg/v1/lms-lead; this adds the key from wp-config.php and
- *              forwards the lead unchanged, so the key never reaches the browser.
- * Version:     1.0.1
+ *              forwards the lead, so the key never reaches the browser. The lead's
+ *              source follows the same campaign rules as the main form (1.1.0).
+ * Version:     1.1.0
  * Author:      YES Germany
  */
 
@@ -28,6 +29,20 @@ defined( 'ABSPATH' ) || exit;
  * `xhr.status === 200` checks in the widgets keep working.
  *
  * Shares the URL, key and failure log with 48-yg-lms-push.php.
+ *
+ * 1.1.0 - the lead's source follows the visitor's campaign (2026-10-15)
+ * ------------------------------------------------------------------------
+ * The LMS files a widget lead under its `source` field. Each hand-built form
+ * sets that itself: "website_popup", "website", "google_ads" (even without an
+ * ad click), "chatbot", or the page URL's utm_source on some. A visitor who
+ * arrived from an ad and enquired on a later page was filed under the page's
+ * label. The relay now applies the main form's rules (mu-plugin 45): UTMs on
+ * the page URL, our own link labels replaced by the first arrival's campaign,
+ * empty filled from the first arrival (yg_attr cookie), and an untagged Google
+ * or Facebook ad click. When that gives a real campaign, `source` and the
+ * form's utm_* fields carry it; otherwise the form's own values go unchanged.
+ * Requests from dubai.yesgermany.com carry no cookie of this site; only their
+ * page URL is used.
  */
 
 const YG_LMS_RELAY_NAMESPACE = 'yg/v1';
@@ -126,6 +141,75 @@ function yg_lms_relay_payload( $body ) {
 	return $payload;
 }
 
+/**
+ * Put the visitor's campaign on a relayed lead (1.1.0).
+ *
+ * @param array $payload Output of yg_lms_relay_payload().
+ * @return array
+ */
+function yg_lms_relay_campaign( array $payload ) {
+	foreach ( array( 'yg_lead_api_utm_from_url', 'yg_lead_api_utm_resolve', 'yg_lead_api_is_internal_utm', 'yg_lead_api_cookie_utm', 'yg_lead_api_clicks_from_url', 'yg_lead_api_cookie_clicks' ) as $fn ) {
+		if ( ! function_exists( $fn ) ) {
+			return $payload;
+		}
+	}
+
+	$keys = array( 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content' );
+	$at   = array();
+	foreach ( $payload['field_data'] as $i => $f ) {
+		$code = strtolower( $f['code'] );
+		if ( ! isset( $at[ $code ] ) ) {
+			$at[ $code ] = $i;
+		}
+	}
+
+	$page = '';
+	if ( ! empty( $payload['tracking_url'] ) ) {
+		$page = (string) $payload['tracking_url'];
+	} elseif ( isset( $at['tracking_url'] ) && '' !== $payload['field_data'][ $at['tracking_url'] ]['value'] ) {
+		$page = $payload['field_data'][ $at['tracking_url'] ]['value'];
+	} elseif ( ! empty( $_SERVER['HTTP_REFERER'] ) ) {
+		$page = (string) wp_unslash( $_SERVER['HTTP_REFERER'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- only its query string is read, and sanitized there.
+	}
+
+	// The cookie is this site's; a request from another site (Dubai) has none of it.
+	$home   = wp_parse_url( home_url(), PHP_URL_HOST );
+	$host   = wp_parse_url( $page, PHP_URL_HOST );
+	$origin = empty( $_SERVER['HTTP_ORIGIN'] ) ? '' : (string) wp_parse_url( (string) wp_unslash( $_SERVER['HTTP_ORIGIN'] ), PHP_URL_HOST ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- compared only.
+	$same   = ( '' === $origin || $origin === $home ) && ( ! $host || $host === $home );
+
+	$utm = array();
+	foreach ( $keys as $key ) {
+		$utm[ $key ] = isset( $at[ $key ] ) ? $payload['field_data'][ $at[ $key ] ]['value'] : '';
+	}
+	$utm    = yg_lead_api_utm_from_url( $utm, $page );
+	$clicks = array( yg_lead_api_clicks_from_url( $page ) );
+	if ( $same ) {
+		$clicks[] = yg_lead_api_cookie_clicks();
+	}
+	$utm = yg_lead_api_utm_resolve( $utm, $same ? yg_lead_api_cookie_utm() : array(), $clicks );
+
+	$source = isset( $utm['utm_source'] ) ? trim( (string) $utm['utm_source'] ) : '';
+	if ( '' === $source || yg_lead_api_is_internal_utm( $source ) ) {
+		return $payload;
+	}
+
+	foreach ( $keys as $key ) {
+		if ( isset( $at[ $key ] ) ) {
+			$payload['field_data'][ $at[ $key ] ]['value'] = isset( $utm[ $key ] ) ? substr( (string) $utm[ $key ], 0, 5000 ) : '';
+		}
+	}
+	if ( isset( $at['source'] ) ) {
+		$payload['field_data'][ $at['source'] ]['value'] = $source;
+	} else {
+		$payload['field_data'][] = array(
+			'code'  => 'source',
+			'value' => $source,
+		);
+	}
+	return $payload;
+}
+
 function yg_lms_relay_fail( $status, $message ) {
 	return new WP_REST_Response(
 		array(
@@ -151,6 +235,7 @@ function yg_lms_relay_handle( WP_REST_Request $request ) {
 	if ( null === $payload ) {
 		return yg_lms_relay_fail( 400, 'Please fill in the form and try again.' );
 	}
+	$payload = yg_lms_relay_campaign( $payload );
 
 	/*
 	 * The same lead twice within two minutes gets the first answer back and is

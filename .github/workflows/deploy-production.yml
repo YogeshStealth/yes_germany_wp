@@ -19,6 +19,10 @@ on:
         description: 'Skip post-deploy health check (not recommended)'
         type: boolean
         default: false
+      allow_live_drift:
+        description: 'Deploy even though files were changed on live since the last deploy and are not in this build (those changes are lost)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -132,6 +136,7 @@ jobs:
           DEPLOY_SSH_KEY_FILE: /home/runner/.ssh/prod_deploy_key
           REMOTE_ROOT: ${{ secrets.PROD_ROOT }}
           REMOTE_BACKUP_DIR: ${{ secrets.PROD_BACKUP_DIR }}
+          ALLOW_LIVE_DRIFT: ${{ inputs.allow_live_drift && 'true' || 'false' }}
         run: bash deployment/deploy.sh production
 
       - name: Health check
