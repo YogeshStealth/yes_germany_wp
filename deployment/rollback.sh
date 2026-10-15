@@ -59,6 +59,12 @@ else
   die "Nothing to roll back to: no backout directory and no backup stamp given."
 fi
 
+# The restored code is what is on live now; the next deploy's drift check
+# compares against it.
+if [[ "$ENVIRONMENT" == "production" ]]; then
+  write_live_manifest && ok "deploy manifest rewritten" || warn "could not rewrite the deploy manifest"
+fi
+
 # ---------------------------------------------------------------------------
 # Clear caches so the restored code is actually what gets served.
 # ---------------------------------------------------------------------------

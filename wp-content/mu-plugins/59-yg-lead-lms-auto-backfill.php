@@ -2,7 +2,7 @@
 /**
  * Plugin Name: YG Lead LMS Check & Backfill
  * Description: Checks every recent www lead in the YES Germany LMS itself (search by phone, then email) and pushes the ones that are not there through the LMS lead-widget API. Run by the system cron every 6 hours via `wp yg-lms-backfill`. Production only.
- * Version:     3.4.0
+ * Version:     3.5.0
  * Author:      Stealth Digital
  *
  * Why
@@ -31,6 +31,15 @@
  *
  * mh leads are email-only (mu-plugin 58) and Dubai leads go through the relay
  * (55), so only www leads are checked.
+ *
+ * 3.5.0 - (2026-10-15)
+ *   - "saved" without a lead ID counts as saved. saveDetails answers
+ *     {"success":true,"message":"Form data saved successfully."} with no
+ *     crm_lead_id for German-language enquiries from Chatgpt / Google-ads.
+ *     The job took that as a failure and sent the same enquiry up to four
+ *     times. A success answer now counts, ID or not; the missing ID is the
+ *     CRM team's to fix.
+ *   - resends credit an ad click without UTM tags as mu 45 2.4.0 does.
  *
  * 3.4.0 - resends use the same campaign rules as the live push (mu 45 2.3.0):
  *         an internal UTM label (Home Page / website / enquiry-form) gives way to
@@ -72,6 +81,8 @@ const YG_LMS_CHECK_MIN_AGE      = 1800;
 const YG_LMS_BACKFILL_MAX_TRIES = 4;
 const YG_LMS_BACKFILL_BATCH     = 300;
 const YG_LMS_READ_BASE          = 'https://lms.yesgermany.org/api/v1';
+// A saveDetails answer that says it saved the enquiry, with or without a crm_lead_id (3.5.0).
+const YG_LMS_CRM_SAVED_LIKE     = '%"success":true%';
 
 /* ----------------------------------------------------------------------------
  * LMS read access
@@ -217,7 +228,7 @@ function yg_lms_backfill_candidates( $limit, $hours = YG_LMS_CHECK_HOURS ) {
 			   AND IFNULL(l.landing_page, '') NOT LIKE %s
 			   AND ( NOT EXISTS ( SELECT 1 FROM $log a WHERE a.lead_id = l.id AND a.channel = 'lms' AND a.ok = 1 )
 			         OR ( %d = 1
-			              AND NOT EXISTS ( SELECT 1 FROM $log c WHERE c.lead_id = l.id AND c.channel = 'crm' AND c.ok = 1 )
+			              AND NOT EXISTS ( SELECT 1 FROM $log c WHERE c.lead_id = l.id AND c.channel = 'crm' AND ( c.ok = 1 OR c.response LIKE %s ) )
 			              AND ( SELECT COUNT(*) FROM $log t WHERE t.lead_id = l.id AND t.transport = 'auto-backfill-crm' ) < %d ) )
 			   AND ( SELECT COUNT(*) FROM $log b WHERE b.lead_id = l.id AND b.transport = 'auto-backfill' ) < %d
 			 ORDER BY l.id
@@ -230,6 +241,7 @@ function yg_lms_backfill_candidates( $limit, $hours = YG_LMS_CHECK_HOURS ) {
 			'%mh.yesgermany.com%',
 			'%mh.yesgermany.com%',
 			yg_lms_backfill_via_crm() ? 1 : 0,
+			YG_LMS_CRM_SAVED_LIKE,
 			YG_LMS_BACKFILL_MAX_TRIES,
 			YG_LMS_BACKFILL_MAX_TRIES,
 			(int) $limit
@@ -253,7 +265,7 @@ function yg_lms_backfill_payload( array $lead ) {
 		$posted = yg_lead_api_utm_from_url( $posted, ! empty( $posted['yg_tracking_url'] ) ? (string) $posted['yg_tracking_url'] : (string) $lead['page_url'] );
 	}
 	if ( function_exists( 'yg_lead_api_utm_resolve' ) ) {
-		$posted = yg_lead_api_utm_resolve( $posted, yg_lms_backfill_first_utm( $lead ) );
+		$posted = yg_lead_api_utm_resolve( $posted, yg_lms_backfill_first_utm( $lead ), yg_lms_backfill_clicks( $lead, $posted ) );
 	}
 
 	/*
@@ -381,9 +393,31 @@ function yg_lead_crm_payload_from_lead( array $lead ) {
 
 	// Nothing on the page or in the form: the UTMs of the visitor's first arrival, stored with the lead (mu-plugin 45 2.2.0).
 	if ( function_exists( 'yg_lead_api_utm_resolve' ) ) {
-		$payload = yg_lead_api_utm_resolve( $payload, yg_lms_backfill_first_utm( $lead ) );
+		$payload = yg_lead_api_utm_resolve( $payload, yg_lms_backfill_first_utm( $lead ), yg_lms_backfill_clicks( $lead, $payload ) );
 	}
 	return $payload;
+}
+
+/**
+ * Ad click IDs for a stored lead: the enquiry page's, then the first arrival's (3.5.0).
+ *
+ * @param array $lead   Row from yg_leads.
+ * @param array $posted Posted fields (for the page URL the browser reported).
+ * @return array[]
+ */
+function yg_lms_backfill_clicks( array $lead, array $posted ) {
+	if ( ! function_exists( 'yg_lead_api_clicks_from_url' ) ) {
+		return array();
+	}
+	$page  = ! empty( $posted['yg_tracking_url'] ) && is_scalar( $posted['yg_tracking_url'] ) ? (string) $posted['yg_tracking_url'] : ( ! empty( $posted['tracking_url'] ) && is_scalar( $posted['tracking_url'] ) ? (string) $posted['tracking_url'] : (string) $lead['page_url'] );
+	$first = yg_lead_api_clicks_from_url( (string) ( $lead['landing_page'] ?? '' ) );
+	if ( '' === $first['gclid'] && ! empty( $lead['gclid'] ) ) {
+		$first['gclid'] = (string) $lead['gclid'];
+	}
+	if ( '' === $first['fbclid'] && ! empty( $lead['fbclid'] ) ) {
+		$first['fbclid'] = (string) $lead['fbclid'];
+	}
+	return array( yg_lead_api_clicks_from_url( $page ), $first );
 }
 
 /**
@@ -413,7 +447,7 @@ function yg_lms_backfill_crm_step( array $lead ) {
 	$log = $wpdb->prefix . 'yg_lead_api_log';
 
 	// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name only.
-	$accepted = $wpdb->get_var( $wpdb->prepare( "SELECT MAX(created_at) FROM $log WHERE lead_id = %d AND channel = 'crm' AND ok = 1", (int) $lead['id'] ) );
+	$accepted = $wpdb->get_var( $wpdb->prepare( "SELECT MAX(created_at) FROM $log WHERE lead_id = %d AND channel = 'crm' AND ( ok = 1 OR response LIKE %s )", (int) $lead['id'], YG_LMS_CRM_SAVED_LIKE ) );
 	$tries    = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $log WHERE lead_id = %d AND channel = 'crm' AND transport = 'auto-backfill-crm'", (int) $lead['id'] ) );
 	// phpcs:enable
 

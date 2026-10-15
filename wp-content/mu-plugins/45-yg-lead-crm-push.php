@@ -5,7 +5,7 @@
  *              validated form submission. Replaces the site-wide JavaScript
  *              submit listener that posted every form, including half-filled
  *              ones, and unhooks it if it is still present in the theme.
- * Version:     2.3.0
+ * Version:     2.4.0
  * Author:      Stealth Digital
  *
  * Why this is a must-use plugin and not theme code
@@ -64,6 +64,17 @@
  * UTMs (or none). Fixed at the source (Cache Enabler "excluded query strings"
  * = /.+/ on live), and here: when the submitting page's URL carries UTMs,
  * those are what the CRM gets.
+ *
+ * 2.4.0 - an ad click without UTM tags is still credited to the ad (2026-10-15)
+ * ------------------------------------------------------------------------
+ * Google adds its own click ID (gclid / gbraid / wbraid) and the campaign ID
+ * (gad_campaignid) to every ad click; Facebook and Instagram add fbclid. Ads
+ * without UTM tags reached the CRM with no source and were filed as
+ * "website". When no UTM source is known (or only one of our own link
+ * labels), the click IDs on the enquiry page or the visitor's first arrival
+ * decide it: Google -> utm_source "Google-Ads" with the Google campaign ID as
+ * utm_campaign; Facebook / Instagram -> utm_source "facebook" (fbclid does not
+ * say which ad, or whether it was an ad or a post). A real UTM always wins.
  *
  * 2.3.0 - our own links no longer replace the visitor's campaign (2026-10-14)
  * ------------------------------------------------------------------------
@@ -829,7 +840,7 @@ function yg_lead_api_payload( $submission, $form_id, $form_title ) {
 	$payload['yg_session_active']  = isset( $browser['yg_session_active'] ) ? $browser['yg_session_active'] : '';
 	$payload['yg_landing_page']    = $attr['landing_page'];
 
-	return yg_lead_api_utm_resolve( yg_lead_api_utm_from_url( $payload, $payload['tracking_url'] ), yg_lead_api_cookie_utm() );
+	return yg_lead_api_utm_resolve( yg_lead_api_utm_from_url( $payload, $payload['tracking_url'] ), yg_lead_api_cookie_utm(), array( yg_lead_api_clicks_from_url( $payload['tracking_url'] ), yg_lead_api_cookie_clicks() ) );
 }
 
 /**
@@ -900,7 +911,7 @@ function yg_lead_api_is_internal_utm( $source ) {
  * @param array $first   utm_* from the first arrival (cookie, or the stored lead).
  * @return array
  */
-function yg_lead_api_utm_resolve( array $payload, array $first ) {
+function yg_lead_api_utm_resolve( array $payload, array $first, array $clicks = array() ) {
 	$keys      = array( 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content' );
 	$first_src = isset( $first['utm_source'] ) && is_scalar( $first['utm_source'] ) ? trim( (string) $first['utm_source'] ) : '';
 	$page_src  = isset( $payload['utm_source'] ) && is_scalar( $payload['utm_source'] ) ? trim( (string) $payload['utm_source'] ) : '';
@@ -909,7 +920,89 @@ function yg_lead_api_utm_resolve( array $payload, array $first ) {
 			$payload[ $key ] = isset( $first[ $key ] ) && is_scalar( $first[ $key ] ) ? sanitize_text_field( (string) $first[ $key ] ) : '';
 		}
 	}
-	return yg_lead_api_utm_first_touch( $payload, $first );
+	return yg_lead_api_utm_from_click( yg_lead_api_utm_first_touch( $payload, $first ), $clicks );
+}
+
+/**
+ * Credit an ad click that carried no UTM tags (2.4.0).
+ *
+ * @param array   $payload Lead payload after the UTM rules.
+ * @param array[] $clicks  Click IDs, most relevant first: this page's, then the first arrival's.
+ * @return array
+ */
+function yg_lead_api_utm_from_click( array $payload, array $clicks ) {
+	$src = isset( $payload['utm_source'] ) && is_scalar( $payload['utm_source'] ) ? trim( (string) $payload['utm_source'] ) : '';
+	if ( '' !== $src && ! yg_lead_api_is_internal_utm( $src ) ) {
+		return $payload;
+	}
+	foreach ( $clicks as $c ) {
+		if ( ! is_array( $c ) ) {
+			continue;
+		}
+		if ( ! empty( $c['gclid'] ) || ! empty( $c['gad_campaignid'] ) ) {
+			$payload['utm_source']   = 'Google-Ads';
+			$payload['utm_medium']   = '';
+			$payload['utm_campaign'] = ! empty( $c['gad_campaignid'] ) ? sanitize_text_field( (string) $c['gad_campaignid'] ) : '';
+			$payload['utm_term']     = '';
+			$payload['utm_content']  = '';
+			return $payload;
+		}
+		if ( ! empty( $c['fbclid'] ) ) {
+			$payload['utm_source']   = 'facebook';
+			$payload['utm_medium']   = '';
+			$payload['utm_campaign'] = '';
+			$payload['utm_term']     = '';
+			$payload['utm_content']  = '';
+			return $payload;
+		}
+	}
+	return $payload;
+}
+
+/**
+ * Ad click IDs in a URL's query string.
+ *
+ * @param string $url Page URL.
+ * @return array{gclid:string,gad_campaignid:string,fbclid:string}
+ */
+function yg_lead_api_clicks_from_url( $url ) {
+	$q = array();
+	parse_str( (string) wp_parse_url( (string) $url, PHP_URL_QUERY ), $q );
+	$get = function ( $k ) use ( $q ) {
+		return isset( $q[ $k ] ) && is_scalar( $q[ $k ] ) ? trim( (string) $q[ $k ] ) : '';
+	};
+	return array(
+		'gclid'          => $get( 'gclid' ) ?: ( $get( 'gbraid' ) ?: $get( 'wbraid' ) ),
+		'gad_campaignid' => $get( 'gad_campaignid' ),
+		'fbclid'         => $get( 'fbclid' ),
+	);
+}
+
+/**
+ * Ad click IDs of the visitor's first arrival (the yg_attr cookie and its landing page).
+ *
+ * @return array{gclid:string,gad_campaignid:string,fbclid:string}
+ */
+function yg_lead_api_cookie_clicks() {
+	$out = array( 'gclid' => '', 'gad_campaignid' => '', 'fbclid' => '' );
+	if ( empty( $_COOKIE['yg_attr'] ) ) {
+		return $out;
+	}
+	$data = json_decode( wp_unslash( $_COOKIE['yg_attr'] ), true ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- sanitized below.
+	if ( ! is_array( $data ) ) {
+		return $out;
+	}
+	$landing = isset( $data['landing_page'] ) && is_scalar( $data['landing_page'] ) ? (string) $data['landing_page'] : '';
+	$from    = yg_lead_api_clicks_from_url( $landing );
+	foreach ( array( 'gclid', 'gbraid', 'wbraid' ) as $k ) {
+		if ( '' === $out['gclid'] && ! empty( $data[ $k ] ) && is_scalar( $data[ $k ] ) ) {
+			$out['gclid'] = sanitize_text_field( (string) $data[ $k ] );
+		}
+	}
+	$out['gclid']          = $out['gclid'] ?: $from['gclid'];
+	$out['gad_campaignid'] = $from['gad_campaignid'];
+	$out['fbclid']         = ! empty( $data['fbclid'] ) && is_scalar( $data['fbclid'] ) ? sanitize_text_field( (string) $data['fbclid'] ) : $from['fbclid'];
+	return $out;
 }
 
 /**
@@ -1229,7 +1322,7 @@ function yg_lead_elementor_record( $record, $handler = null ) {
 		$payload['yg_referral_url']   = ! empty( $browser['yg_referral_url'] ) ? $browser['yg_referral_url'] : $attr['referrer'];
 		$payload['yg_session_active'] = isset( $browser['yg_session_active'] ) ? $browser['yg_session_active'] : '';
 
-		yg_lead_api_send( yg_lead_api_utm_resolve( yg_lead_api_utm_from_url( $payload, $payload['tracking_url'] ), yg_lead_api_cookie_utm() ) );
+		yg_lead_api_send( yg_lead_api_utm_resolve( yg_lead_api_utm_from_url( $payload, $payload['tracking_url'] ), yg_lead_api_cookie_utm(), array( yg_lead_api_clicks_from_url( $payload['tracking_url'] ), yg_lead_api_cookie_clicks() ) ) );
 	} catch ( \Throwable $e ) {
 		yg_lead_api_log( 'elementor: ' . $e->getMessage(), array() );
 	}
