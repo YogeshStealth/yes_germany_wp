@@ -26,7 +26,7 @@
  *              YG_JS_DELAY_SCOPE    'home' = homepage only, 'site' = every eligible page.
  *              YG_JS_DELAY_PUBLIC   false = only for requests carrying ?yg_delaytest=1.
  *              To revert, remove this file and clear the page cache.
- * Version:     2.0.0
+ * Version:     2.1.0
  * Author:      YES Germany
  */
 
@@ -171,6 +171,10 @@ function yg_js_delay_unsafe_reason( $html ) {
  * are marked data-no-lazy, which LiteSpeed respects; the first also gets
  * fetchpriority="high".
  *
+ * Pages whose hero pictures are listed in plugin 64 are left to it: on the
+ * homepage this guess picked a picture hidden on every device and a banner
+ * 4,000px down the page.
+ *
  * @param string $html Page HTML.
  * @return string
  */
@@ -178,6 +182,13 @@ function yg_js_delay_eager_hero( $html ) {
 	$body = stripos( $html, '<body' );
 	if ( false === $body ) {
 		return $html;
+	}
+	if ( defined( 'YG_ABOVE_FOLD_HERO_IMAGES' ) ) {
+		foreach ( YG_ABOVE_FOLD_HERO_IMAGES as $file ) {
+			if ( false !== strpos( $html, $file, $body ) ) {
+				return $html;
+			}
+		}
 	}
 	$count = 0;
 	$tail  = preg_replace_callback(
