@@ -26,7 +26,7 @@
  *              YG_JS_DELAY_SCOPE    'home' = homepage only, 'site' = every eligible page.
  *              YG_JS_DELAY_PUBLIC   false = only for requests carrying ?yg_delaytest=1.
  *              To revert, remove this file and clear the page cache.
- * Version:     2.1.0
+ * Version:     2.1.1
  * Author:      YES Germany
  */
 
@@ -255,11 +255,19 @@ add_action(
 			'ht_ctc', // WhatsApp button settings: its script is not delayed, so neither are they.
 		);
 
+		// Inline scripts the page needs to look right before the first touch.
+		$visual_inline = array(
+			// Elementor's background lazy-load: its CSS hides every section's background
+			// image until this marks the section loaded. Delayed, the homepage's mobile
+			// hero stayed transparent and the fixed footer showed through it.
+			'lazyloadRunObserver',
+		);
+
 		do_action( 'litespeed_conf_force', 'optm-js_exc', array_merge( array( 'jquery.js', 'jquery.min.js' ), $form_files ) );
 		do_action(
 			'litespeed_conf_force',
 			'optm-js_defer_exc',
-			array_merge( array( 'jquery.js', 'jquery.min.js' ), YG_JS_DELAY_GOOGLE_TAGS ? array() : array( 'gtm.js', 'analytics.js' ), $form_files, $form_inline )
+			array_merge( array( 'jquery.js', 'jquery.min.js' ), YG_JS_DELAY_GOOGLE_TAGS ? array() : array( 'gtm.js', 'analytics.js' ), $form_files, $form_inline, $visual_inline )
 		);
 		do_action( 'litespeed_conf_force', 'optm-js_defer', 2 );
 	},
