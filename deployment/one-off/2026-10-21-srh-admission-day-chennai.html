@@ -1,0 +1,849 @@
+<style id="ysrh-css">
+/* SRH Admission Day Chennai 2026 (www page, 21 Oct 2026). Layout from "SRH Admission Day Chennai.html",
+   scoped to .ysrh and sized in px because the theme root is 10px. Site header, footer, bottom bar
+   and WhatsApp button come from the site. The form is the site's Enquiry Form (CF7 139211). */
+.ysrh{--yg-yellow:#FFCF00;
+  --yg-yellow-soft:#FFF4B8;
+  --yg-red:#B91C1C;
+  --yg-red-dark:#991B1B;
+  --ink:#0F172A;
+  --ink-2:#1E293B;
+  --body:#475569;
+  --muted:#64748B;
+  --line:#E2E8F0;
+  --line-2:#F1F5F9;
+  --soft:#F8FAFC;
+  --white:#FFFFFF;
+  --good:#16A34A;
+  --ff-head:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  --ff-body:'Poppins',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  --radius:14px;
+  --radius-sm:8px;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.06), 0 1px 3px rgba(15,23,42,.08);
+  --shadow-md:0 4px 6px -1px rgba(15,23,42,.08), 0 8px 20px -4px rgba(15,23,42,.08);
+  --shadow-lg:0 10px 25px -5px rgba(15,23,42,.10), 0 20px 40px -10px rgba(15,23,42,.12);
+  color-scheme: light;}
+.ysrh *,.ysrh *::before,.ysrh *::after{box-sizing:border-box}
+.ysrh{margin:0;
+  font-family:var(--ff-body);
+  font-size:16px;
+  line-height:1.6;
+  color:var(--body);
+  background:var(--white);
+  -webkit-font-smoothing:antialiased;
+  }
+.ysrh h1,.ysrh h2,.ysrh h3,.ysrh h4,.ysrh h5{font-family:var(--ff-head);
+  color:var(--ink);
+  margin:0;
+  line-height:1.2;
+  text-wrap:balance;}
+.ysrh p{margin:0}
+.ysrh a{color:var(--yg-red);text-decoration:none}
+.ysrh a:hover{text-decoration:underline}
+.ysrh img{max-width:100%;display:block}
+.ysrh button{font-family:inherit;cursor:pointer;border:0}
+.ysrh :focus-visible{outline:3px solid var(--yg-yellow);outline-offset:2px;border-radius:4px}
+.ysrh .wrap{width:100%;max-width:1200px;margin:0 auto;
+  padding-left:max(20px, env(safe-area-inset-left, 0px));
+  padding-right:max(20px, env(safe-area-inset-right, 0px));}
+.ysrh .band{padding-block:72px}
+.ysrh .band-soft{background:var(--soft)}
+.ysrh .band-yellow{background:linear-gradient(180deg,#FFF9CC 0%, #FFF4B8 100%)}
+.ysrh .topstrip{background:var(--ink);
+  color:#fff;
+  font-size:13px;
+  padding:10px 0;}
+.ysrh .topstrip .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.ysrh .topstrip strong{color:var(--yg-yellow)}
+.ysrh .topstrip .cd{display:flex;align-items:center;gap:8px;font-weight:500}
+.ysrh .topstrip .cd span{background:var(--yg-red);padding:2px 10px;border-radius:999px;font-weight:600;letter-spacing:.3px}
+.ysrh .logo-mark{width:38px;height:38px;border-radius:8px;
+  background:var(--yg-yellow);
+  display:grid;place-items:center;font-weight:800;color:var(--ink);font-size:18px;
+  box-shadow:inset 0 0 0 2px var(--ink)}
+.ysrh .hero{background:
+    radial-gradient(1200px 400px at 85% -10%, rgba(255,207,0,.35), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(185,28,28,.08), transparent 60%),
+    var(--white);
+  padding-block:56px 72px;
+  overflow:hidden;}
+.ysrh .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:48px;align-items:start}
+.ysrh .flag-badge{display:inline-flex;align-items:center;gap:10px;
+  background:#fff;border:1px solid var(--line);
+  padding:8px 14px;border-radius:999px;font-size:13px;font-weight:600;color:var(--ink);
+  box-shadow:var(--shadow-sm);margin-bottom:20px}
+.ysrh .flag-badge .de{width:22px;height:14px;border-radius:2px;overflow:hidden;flex:none;
+  background:linear-gradient(180deg,#000 0 33.3%,#DD0000 33.3% 66.6%,#FFCE00 66.6% 100%)}
+.ysrh .hero h1{font-size:clamp(32px, 4.6vw, 54px);font-weight:800;letter-spacing:-.02em;
+  color:var(--ink);margin-bottom:18px}
+.ysrh .hero h1 .accent{color:var(--yg-red);display:inline-block;position:relative}
+.ysrh .hero h1 .accent::after{content:"";position:absolute;left:0;right:0;bottom:4px;height:12px;
+  background:var(--yg-yellow);opacity:.55;z-index:-1;border-radius:2px}
+.ysrh .hero .lede{font-size:18px;line-height:1.6;color:var(--body);max-width:580px;margin-bottom:28px}
+.ysrh .event-chips{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:28px}
+.ysrh .chip{display:inline-flex;align-items:center;gap:10px;
+  background:#fff;border:1.5px solid var(--line);
+  padding:12px 16px;border-radius:10px;font-weight:600;color:var(--ink);font-size:14px}
+.ysrh .chip svg{color:var(--yg-red);flex:none}
+.ysrh .chip strong{color:var(--yg-red);font-weight:700}
+.ysrh .hero-benefits{display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;margin-bottom:28px}
+.ysrh .hero-benefits li{list-style:none;display:flex;align-items:flex-start;gap:10px;font-size:15px;color:var(--ink-2);font-weight:500}
+.ysrh .hero-benefits svg{color:var(--good);flex:none;margin-top:2px}
+.ysrh .hero ul{padding:0;margin:0}
+.ysrh .hero-actions{display:flex;flex-wrap:wrap;gap:14px}
+.ysrh .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:16px 28px;border-radius:10px;font-weight:600;font-size:16px;
+  transition:.2s;text-decoration:none;white-space:nowrap}
+.ysrh .btn-primary{background:var(--yg-red);color:#fff;box-shadow:var(--shadow-md)}
+.ysrh .btn-primary:hover{background:var(--yg-red-dark);text-decoration:none;transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.ysrh .btn-ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+.ysrh .btn-ghost:hover{border-color:var(--ink);text-decoration:none}
+.ysrh .btn-wa{background:#25D366;color:#fff}
+.ysrh .btn-wa:hover{background:#1DA851;text-decoration:none;color:#fff}
+.ysrh .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ysrh .visual-band{padding:48px 0;background:#fff}
+.ysrh .visual-band-soft{background:var(--soft)}
+.ysrh .visual-wrap{max-width:1200px;margin:0 auto;
+  padding-left:max(20px, env(safe-area-inset-left, 0px));
+  padding-right:max(20px, env(safe-area-inset-right, 0px));}
+.ysrh .visual-card{border-radius:20px;overflow:hidden;box-shadow:var(--shadow-md);
+  position:relative;background:#FFF9CC}
+.ysrh .visual-card svg{width:100%;height:auto;display:block}
+.ysrh .visual-caption{text-align:center;margin-top:20px;color:var(--muted);font-size:14px;font-style:italic}
+.ysrh .cities-strip{background:linear-gradient(180deg, #FFFBEA 0%, #FFF9CC 100%);
+  border-radius:20px;padding:36px 20px 24px;border:1px solid var(--line)}
+.ysrh .cities-strip svg{width:100%;height:auto;display:block;max-width:1100px;margin:0 auto}
+.ysrh .cities-head{text-align:center;margin-bottom:24px}
+.ysrh .cities-head h3{font-size:22px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.ysrh .cities-head p{font-size:14px;color:var(--muted)}
+.ysrh .trust{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:24px 0}
+.ysrh .trust .wrap{display:flex;align-items:center;justify-content:space-around;flex-wrap:wrap;gap:28px}
+.ysrh .trust-item{display:flex;align-items:center;gap:12px}
+.ysrh .trust-item .num{font-family:var(--ff-head);font-weight:700;font-size:22px;color:var(--ink);line-height:1}
+.ysrh .trust-item .lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-weight:500}
+.ysrh .trust-item .star{color:#F59E0B;font-size:14px;letter-spacing:1px}
+.ysrh .eyebrow{display:inline-block;background:var(--yg-yellow);color:var(--ink);
+  padding:5px 14px;border-radius:999px;font-size:12px;font-weight:700;
+  letter-spacing:.8px;text-transform:uppercase;margin-bottom:14px}
+.ysrh .section-head{text-align:center;max-width:720px;margin:0 auto 48px}
+.ysrh .section-head h2{font-size:clamp(28px,3.5vw,40px);font-weight:700;letter-spacing:-.015em;margin-bottom:14px}
+.ysrh .section-head p{font-size:17px;color:var(--body);line-height:1.6}
+.ysrh .features{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.ysrh .feature{background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:28px 24px;transition:.2s}
+.ysrh .feature:hover{transform:translateY(-4px);box-shadow:var(--shadow-md);border-color:transparent}
+.ysrh .feature-icon{width:52px;height:52px;background:var(--yg-yellow-soft);border-radius:12px;
+  display:grid;place-items:center;color:var(--yg-red);margin-bottom:16px}
+.ysrh .feature h3{font-size:17px;font-weight:600;margin-bottom:10px;color:var(--ink)}
+.ysrh .feature p{font-size:14px;color:var(--body);line-height:1.6}
+.ysrh .prog-tabs{display:inline-flex;background:#fff;padding:5px;border-radius:10px;
+  border:1px solid var(--line);margin-bottom:32px;box-shadow:var(--shadow-sm)}
+.ysrh .prog-tab{background:transparent;color:var(--muted);padding:12px 24px;
+  font-weight:600;font-size:14px;border-radius:7px;transition:.2s}
+.ysrh .prog-tab.active{background:var(--yg-red);color:#fff;box-shadow:var(--shadow-sm)}
+.ysrh .tabs-wrap{text-align:center}
+.ysrh .prog-panel{display:none;text-align:left}
+.ysrh .prog-panel.active{display:block}
+.ysrh .fields-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:960px;margin:0 auto 32px}
+.ysrh .field-card{background:#fff;border:1px solid var(--line);border-radius:10px;
+  padding:18px 20px;display:flex;align-items:center;gap:14px;transition:.2s}
+.ysrh .field-card:hover{border-color:var(--yg-yellow);background:#FFFEF7}
+.ysrh .field-card .fc-icon{width:40px;height:40px;background:var(--soft);border-radius:8px;
+  display:grid;place-items:center;color:var(--yg-red);flex:none;font-size:18px;font-weight:700}
+.ysrh .field-card .fc-text{font-weight:500;color:var(--ink);font-size:14px;line-height:1.4}
+.ysrh .prog-note{background:#FFFEF7;border-left:4px solid var(--yg-yellow);
+  padding:16px 20px;border-radius:8px;font-size:14px;color:var(--body);
+  max-width:860px;margin:0 auto}
+.ysrh .panel-cta{text-align:center;margin-top:28px}
+.ysrh .decision{display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:center;
+  background:#fff;border-radius:20px;padding:48px;border:1px solid var(--line)}
+.ysrh .decision h2{font-size:clamp(26px,3vw,34px);margin-bottom:16px}
+.ysrh .decision p{color:var(--body);margin-bottom:14px;font-size:15px}
+.ysrh .decision .highlight{color:var(--yg-red);font-weight:600}
+.ysrh .decision-stat{background:linear-gradient(135deg,var(--yg-yellow) 0%,#FFE066 100%);
+  border-radius:16px;padding:40px 32px;text-align:center}
+.ysrh .decision-stat .big{font-family:var(--ff-head);font-weight:800;font-size:72px;color:var(--ink);
+  line-height:1;letter-spacing:-.03em}
+.ysrh .decision-stat .label{font-size:14px;font-weight:600;color:var(--ink);margin-top:12px;line-height:1.4}
+.ysrh .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;position:relative}
+.ysrh .step{background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:28px 20px;text-align:center;position:relative}
+.ysrh .step-num{width:44px;height:44px;border-radius:50%;background:var(--yg-red);color:#fff;
+  display:grid;place-items:center;font-family:var(--ff-head);font-weight:700;
+  margin:0 auto 16px;font-size:18px;
+  box-shadow:0 4px 10px rgba(185,28,28,.25)}
+.ysrh .step h3{font-size:15px;font-weight:600;margin-bottom:8px;color:var(--ink)}
+.ysrh .step p{font-size:13px;color:var(--body);line-height:1.5}
+.ysrh .evt{background:var(--ink);color:#fff;border-radius:20px;padding:48px;
+  display:grid;grid-template-columns:1.3fr 1fr;gap:48px;align-items:center;
+  position:relative;overflow:hidden}
+.ysrh .evt::before{content:"";position:absolute;top:-50px;right:-50px;width:300px;height:300px;
+  background:radial-gradient(circle,var(--yg-yellow) 0%,transparent 70%);opacity:.15}
+.ysrh .evt h2{color:#fff;font-size:clamp(26px,3vw,34px);margin-bottom:12px}
+.ysrh .evt p{color:#CBD5E1;margin-bottom:28px;font-size:15px}
+.ysrh .evt-list{display:grid;gap:16px;margin:0;padding:0;list-style:none;position:relative;z-index:1}
+.ysrh .evt-list li{display:flex;align-items:flex-start;gap:14px;
+  padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.ysrh .evt-list li:last-child{border:0;padding-bottom:0}
+.ysrh .evt-list .ei{width:40px;height:40px;background:var(--yg-yellow);border-radius:8px;
+  display:grid;place-items:center;color:var(--ink);flex:none}
+.ysrh .evt-list .ei-text .et{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--yg-yellow);font-weight:600;margin-bottom:2px}
+.ysrh .evt-list .ei-text .ev{font-size:17px;font-weight:600;color:#fff}
+.ysrh .evt-cta{text-align:center;position:relative;z-index:1}
+.ysrh .evt-cta .btn{width:100%}
+.ysrh .evt-cta .sub{font-size:12px;color:#94A3B8;margin-top:12px}
+.ysrh .faq{max-width:860px;margin:0 auto;display:grid;gap:10px}
+.ysrh .faq-item{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;transition:.2s}
+.ysrh .faq-item[open]{border-color:var(--yg-red);box-shadow:var(--shadow-sm)}
+.ysrh .faq-item summary{padding:18px 22px;cursor:pointer;font-weight:600;font-size:15px;
+  color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:16px;
+  list-style:none}
+.ysrh .faq-item summary::-webkit-details-marker{display:none}
+.ysrh .faq-item summary::after{content:"+";font-size:22px;font-weight:400;color:var(--yg-red);
+  width:28px;height:28px;background:var(--yg-yellow-soft);border-radius:50%;
+  display:grid;place-items:center;flex:none;transition:.2s}
+.ysrh .faq-item[open] summary::after{content:"−";background:var(--yg-red);color:#fff}
+.ysrh .faq-item .faq-body{padding:0 22px 20px;font-size:14.5px;color:var(--body);line-height:1.6}
+.ysrh .cta-final{background:linear-gradient(135deg,var(--yg-red) 0%,#DC2626 50%,var(--yg-red-dark) 100%);
+  color:#fff;border-radius:20px;padding:60px 40px;text-align:center;
+  position:relative;overflow:hidden}
+.ysrh .cta-final::before,.ysrh .cta-final::after{content:"";position:absolute;border-radius:50%;background:rgba(255,207,0,.15)}
+.ysrh .cta-final::before{width:300px;height:300px;top:-100px;left:-100px}
+.ysrh .cta-final::after{width:200px;height:200px;bottom:-50px;right:-50px}
+.ysrh .cta-final h2{color:#fff;font-size:clamp(28px,3.5vw,40px);margin-bottom:14px;position:relative;z-index:1}
+.ysrh .cta-final p{color:#FEE2E2;font-size:17px;margin-bottom:28px;max-width:560px;margin-inline:auto;position:relative;z-index:1}
+.ysrh .cta-final .btn-primary{background:var(--yg-yellow);color:var(--ink);position:relative;z-index:1}
+.ysrh .cta-final .btn-primary:hover{background:#fff}
+.ysrh .modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:100;
+  display:none;align-items:center;justify-content:center;padding:20px;
+  overflow-y:auto}
+.ysrh .modal-backdrop.open{display:flex}
+.ysrh .modal-head{padding:28px 28px 10px;position:relative}
+.ysrh .modal-head h3{font-size:22px;margin-bottom:6px}
+.ysrh .modal-head p{font-size:14px;color:var(--muted)}
+.ysrh .modal-close{position:absolute;top:16px;right:16px;background:var(--soft);
+  border:0;width:34px;height:34px;border-radius:50%;font-size:20px;color:var(--ink);
+  display:grid;place-items:center;cursor:pointer}
+.ysrh .modal-close:hover{background:var(--line)}
+.ysrh .modal-body{padding:16px 28px 28px}
+@media (max-width:960px){
+.ysrh .hero-grid{grid-template-columns:1fr;gap:36px}
+.ysrh .features{grid-template-columns:repeat(2,1fr)}
+.ysrh .steps{grid-template-columns:repeat(2,1fr)}
+.ysrh .decision{grid-template-columns:1fr;padding:36px 28px;gap:28px}
+.ysrh .evt{grid-template-columns:1fr;padding:36px 28px;gap:32px}
+.ysrh .fields-grid{grid-template-columns:repeat(2,1fr)}
+.ysrh .band{padding-block:56px}
+}
+@media (max-width:640px){
+.ysrh .topstrip .wrap{justify-content:center;text-align:center}
+.ysrh .hero{padding-block:36px 48px}
+.ysrh .hero-benefits{grid-template-columns:1fr}
+.ysrh .features{grid-template-columns:1fr}
+.ysrh .steps{grid-template-columns:1fr}
+.ysrh .fields-grid{grid-template-columns:1fr}
+.ysrh .trust .wrap{gap:20px;justify-content:center}
+.ysrh .trust-item{flex-direction:column;gap:4px;text-align:center}
+.ysrh .cta-final{padding:40px 24px}
+.ysrh .prog-tabs{display:flex;width:100%}
+.ysrh .prog-tab{flex:1;padding:12px 10px}
+.ysrh .field-row{grid-template-columns:1fr}
+.ysrh .band{padding-block:44px}
+.ysrh .section-head{margin-bottom:32px}
+}
+
+/* Additions for the page on www (inside the site's header and footer, no custom JS) */
+.ysrh{background:#fff}
+.ysrh h1,.ysrh h2,.ysrh h3{font-family:var(--ff-head);text-transform:none}
+.ysrh h2{font-weight:700}
+.ysrh h3{font-weight:600}
+.ysrh .hero h1{font-weight:800}
+.ysrh ul{list-style:none}
+.ysrh .hero .sub-h{font-size:clamp(18px,2vw,22px);font-weight:600;color:var(--yg-red);margin-bottom:16px}
+.ysrh .hero .lede + .lede{margin-top:-14px}
+.ysrh .note-sm{font-size:13px;color:var(--muted);margin-top:14px}
+.ysrh .prog-intro{max-width:860px;margin:0 auto 28px;text-align:center}
+.ysrh .prog-intro p{font-size:15.5px;color:var(--body);margin-bottom:10px}
+.ysrh .prog-intro h3{font-size:18px;margin:6px 0 4px}
+.ysrh .decision-stat .big{font-size:56px}
+/* Enquiry Form card (site form 139211) */
+.ysrh .form-card{scroll-margin-top:120px;filter:drop-shadow(0 18px 40px rgba(15,23,42,.18))}
+.ysrh .form-card .wpcf7{margin:0}
+@media (min-width:961px){.ysrh .form-card{position:sticky;top:24px;align-self:start}}
+/* CSS-only programme tabs (scripts on this site wait for the first tap) */
+.ysrh .tab-radio{position:absolute;opacity:0;pointer-events:none}
+.ysrh .prog-tab{display:inline-block;cursor:pointer;user-select:none}
+.ysrh #ysrh-t-m:checked ~ .tabs-wrap label[for=ysrh-t-m],
+.ysrh #ysrh-t-b:checked ~ .tabs-wrap label[for=ysrh-t-b]{background:var(--yg-red);color:#fff;box-shadow:var(--shadow-sm)}
+.ysrh #ysrh-t-m:checked ~ #panel-masters,.ysrh #ysrh-t-b:checked ~ #panel-bachelors{display:block}
+.ysrh .tab-radio:focus-visible ~ .tabs-wrap .prog-tabs{outline:3px solid var(--yg-yellow);outline-offset:2px}
+/* Date block in place of the countdown */
+.ysrh .date-block{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.ysrh .date-block div{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:14px 6px;text-align:center}
+.ysrh .date-block b{display:block;font-family:var(--ff-head);font-weight:700;font-size:24px;color:var(--yg-yellow);line-height:1}
+.ysrh .date-block span{display:block;font-size:10px;color:#CBD5E1;text-transform:uppercase;letter-spacing:.5px;margin-top:6px}
+.ysrh .register{max-width:760px;margin:0 auto;text-align:center}
+.ysrh .register h2{font-size:clamp(26px,3vw,34px);margin-bottom:12px}
+.ysrh .register p{margin-bottom:22px}
+.ysrh .legal{font-size:13px;color:var(--muted);text-align:center;max-width:860px;margin:0 auto;font-style:italic}
+@media (max-width:640px){.ysrh .btn{white-space:normal;text-align:center;max-width:100%}.ysrh .date-block b{font-size:20px}}
+
+</style>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "EducationEvent", "name": "SRH Admission Day Chennai 2026", "startDate": "2026-11-14", "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode", "eventStatus": "https://schema.org/EventScheduled", "location": {"@type": "Place", "name": "Chennai (venue to be announced)", "address": {"@type": "PostalAddress", "addressLocality": "Chennai", "addressRegion": "Tamil Nadu", "addressCountry": "IN"}}, "organizer": {"@type": "Organization", "name": "YES Germany", "url": "https://www.yesgermany.com/"}, "description": "Meet the SRH University admissions team in Chennai on 14 November 2026 to explore Master's programmes and selected Bachelor's programmes in Germany."}
+</script>
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Who should attend SRH Admission Day Chennai?", "acceptedAnswer": {"@type": "Answer", "text": "Students planning to pursue higher education in Germany and exploring suitable SRH University programmes."}}, {"@type": "Question", "name": "Can I discuss more than one programme?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. You can discuss your preferred fields of study and ask which programmes may align with your academic background."}}, {"@type": "Question", "name": "Which intake should I apply for?", "acceptedAnswer": {"@type": "Answer", "text": "The suitable intake depends on your chosen programme, eligibility, and application timeline. Check the relevant programme page for current intake details."}}, {"@type": "Question", "name": "Can I attend if I have not finalised my course?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The event can help you explore relevant study options before deciding which programme to pursue."}}, {"@type": "Question", "name": "Can I ask about application deadlines and intakes?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. You can ask about relevant application timelines, available intakes, and the next steps for your preferred programme."}}, {"@type": "Question", "name": "Will I receive guidance on the application process?", "acceptedAnswer": {"@type": "Answer", "text": "You can discuss the application process and clarify the steps you may need to complete after the event."}}, {"@type": "Question", "name": "How can I prepare for the event?", "acceptedAnswer": {"@type": "Answer", "text": "Review your academic history, shortlist your preferred fields, and prepare questions about eligibility, intakes, and application requirements."}}, {"@type": "Question", "name": "Which documents should I bring?", "acceptedAnswer": {"@type": "Answer", "text": "Carry your available academic transcripts, degree certificates and identification. Check with the event team for the confirmed document checklist and any programme-specific requirements."}}, {"@type": "Question", "name": "Can I ask about English language requirements?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. You can ask about the English language proficiency requirements for your preferred programme and which forms of proof may be accepted."}}, {"@type": "Question", "name": "How can I register for the event?", "acceptedAnswer": {"@type": "Answer", "text": "Complete the registration form on this page once registration is enabled. Further instructions, including the confirmed venue and event timings, will be shared as they become available."}}]}
+</script>
+<div class="ysrh">
+
+<div class="topstrip">
+  <div class="wrap">
+    <div>🇩🇪 <strong>SRH University, Germany</strong> — Admission Day Chennai 2026</div>
+    <div class="cd"><span>Sat</span> 14 November 2026 · Chennai</div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="flag-badge"><span class="de" aria-hidden="true"></span>SRH Admission Day Chennai 2026 · Study in Germany</div>
+        <h1>Explore Your <span class="accent">Master's</span> Options in Germany</h1>
+        <p class="sub-h">Meet the admissions team in Chennai on 14 November 2026.</p>
+        <p class="lede">Planning to pursue a Master's degree in Germany? Attend SRH Admission Day Chennai to explore postgraduate study options, discuss your academic background, and understand the next steps in the application process.</p>
+        <p class="lede">Master's programmes are the primary focus of this event, with selected Bachelor's programmes also available for eligible applicants.</p>
+        <div class="event-chips">
+          <div class="chip"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><strong>14 November 2026</strong></div>
+          <div class="chip"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Chennai, India</div>
+        </div>
+        <ul class="hero-benefits">
+          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Explore Master's programmes</li>
+          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Explore selected Bachelor's programmes</li>
+          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Discuss your academic profile</li>
+          <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Understand the application process</li>
+        </ul>
+        <div class="hero-actions">
+          <a href="#register" class="btn btn-primary">Register for Admission Day →</a>
+          <a href="https://wa.me/918070606070?text=Hi%2C%20I%27d%20like%20to%20know%20about%20SRH%20Admission%20Day%20Chennai" class="btn btn-wa"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884a9.86 9.86 0 001.51 5.26l-.999 3.648 3.978-1.607z"/></svg> Chat on WhatsApp</a>
+        </div>
+        <p class="note-sm">Venue, event timings, and registration instructions will be shared once confirmed.</p>
+      </div>
+      <aside class="form-card" id="register" aria-label="Register for SRH Admission Day Chennai">
+        [contact-form-7 id="139211" title="Enquiry Form"]
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section class="visual-band">
+  <div class="visual-wrap">
+    <div class="visual-card">
+            <svg viewBox="0 0 1200 380" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" aria-labelledby="viz1-title" role="img">
+        <title id="viz1-title">SRH University, Germany — modern campus scene</title>
+        <defs>
+          <linearGradient id="vg-sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FFF9CC"/>
+            <stop offset="55%" stop-color="#FFF4B8"/>
+            <stop offset="100%" stop-color="#FFE066"/>
+          </linearGradient>
+          <linearGradient id="vg-bldg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1E293B"/>
+            <stop offset="100%" stop-color="#0F172A"/>
+          </linearGradient>
+        </defs>
+        <!-- Sky -->
+        <rect width="1200" height="320" fill="url(#vg-sky)"/>
+        <!-- Sun -->
+        <circle cx="920" cy="80" r="58" fill="#FFCF00" opacity="0.35"/>
+        <circle cx="920" cy="80" r="40" fill="#FFCF00"/>
+        <!-- Clouds -->
+        <g fill="#ffffff" opacity="0.7">
+          <ellipse cx="200" cy="60" rx="55" ry="12"/>
+          <ellipse cx="240" cy="68" rx="35" ry="9"/>
+          <ellipse cx="520" cy="45" rx="70" ry="14"/>
+          <ellipse cx="730" cy="90" rx="42" ry="10"/>
+        </g>
+        <!-- Ground + red brand strip -->
+        <rect y="320" width="1200" height="60" fill="#1E293B"/>
+        <rect y="316" width="1200" height="6" fill="#B91C1C"/>
+        <!-- Trees left -->
+        <ellipse cx="60" cy="286" rx="32" ry="40" fill="#166534"/>
+        <rect x="56" y="300" width="8" height="26" fill="#44403C"/>
+        <!-- Building 1: wide modern -->
+        <rect x="120" y="170" width="200" height="150" fill="url(#vg-bldg)"/>
+        <rect x="120" y="170" width="200" height="8" fill="#B91C1C"/>
+        <g fill="#FFCF00">
+          <rect x="138" y="195" width="18" height="24" opacity="0.95"/>
+          <rect x="168" y="195" width="18" height="24" opacity="0.9"/>
+          <rect x="198" y="195" width="18" height="24" opacity="0.95"/>
+          <rect x="228" y="195" width="18" height="24" opacity="0.85"/>
+          <rect x="258" y="195" width="18" height="24" opacity="0.95"/>
+          <rect x="288" y="195" width="18" height="24" opacity="0.9"/>
+          <rect x="138" y="228" width="18" height="24" opacity="0.85"/>
+          <rect x="168" y="228" width="18" height="24" opacity="0.95"/>
+          <rect x="198" y="228" width="18" height="24" opacity="0.9"/>
+          <rect x="228" y="228" width="18" height="24" opacity="0.95"/>
+          <rect x="258" y="228" width="18" height="24" opacity="0.85"/>
+          <rect x="288" y="228" width="18" height="24" opacity="0.95"/>
+          <rect x="138" y="261" width="18" height="24" opacity="0.9"/>
+          <rect x="168" y="261" width="18" height="24" opacity="0.85"/>
+          <rect x="198" y="261" width="18" height="24" opacity="0.95"/>
+          <rect x="228" y="261" width="18" height="24" opacity="0.9"/>
+          <rect x="258" y="261" width="18" height="24" opacity="0.95"/>
+          <rect x="288" y="261" width="18" height="24" opacity="0.85"/>
+        </g>
+        <!-- Door -->
+        <rect x="210" y="293" width="28" height="27" fill="#FFCF00"/>
+        <!-- German flag on building -->
+        <g>
+          <line x1="222" y1="138" x2="222" y2="170" stroke="#64748B" stroke-width="1.5"/>
+          <rect x="222" y="138" width="34" height="26" fill="#fff"/>
+          <rect x="222" y="138" width="34" height="9" fill="#000"/>
+          <rect x="222" y="147" width="34" height="9" fill="#DD0000"/>
+          <rect x="222" y="156" width="34" height="8" fill="#FFCF00"/>
+        </g>
+        <!-- Building 2: tall tower -->
+        <rect x="360" y="90" width="90" height="230" fill="#0F172A"/>
+        <rect x="360" y="90" width="90" height="6" fill="#B91C1C"/>
+        <polygon points="360,90 405,65 450,90" fill="#1E293B"/>
+        <g fill="#FFCF00">
+          <rect x="372" y="110" width="10" height="16" opacity="0.9"/>
+          <rect x="394" y="110" width="10" height="16" opacity="0.95"/>
+          <rect x="416" y="110" width="10" height="16" opacity="0.85"/>
+          <rect x="434" y="110" width="10" height="16" opacity="0.9"/>
+          <rect x="372" y="138" width="10" height="16" opacity="0.95"/>
+          <rect x="394" y="138" width="10" height="16" opacity="0.9"/>
+          <rect x="416" y="138" width="10" height="16" opacity="0.95"/>
+          <rect x="434" y="138" width="10" height="16" opacity="0.85"/>
+          <rect x="372" y="166" width="10" height="16" opacity="0.9"/>
+          <rect x="394" y="166" width="10" height="16" opacity="0.85"/>
+          <rect x="416" y="166" width="10" height="16" opacity="0.95"/>
+          <rect x="434" y="166" width="10" height="16" opacity="0.9"/>
+          <rect x="372" y="194" width="10" height="16" opacity="0.85"/>
+          <rect x="394" y="194" width="10" height="16" opacity="0.95"/>
+          <rect x="416" y="194" width="10" height="16" opacity="0.9"/>
+          <rect x="434" y="194" width="10" height="16" opacity="0.95"/>
+          <rect x="372" y="222" width="10" height="16" opacity="0.9"/>
+          <rect x="394" y="222" width="10" height="16" opacity="0.85"/>
+          <rect x="416" y="222" width="10" height="16" opacity="0.95"/>
+          <rect x="434" y="222" width="10" height="16" opacity="0.9"/>
+          <rect x="372" y="250" width="10" height="16" opacity="0.95"/>
+          <rect x="394" y="250" width="10" height="16" opacity="0.9"/>
+          <rect x="416" y="250" width="10" height="16" opacity="0.95"/>
+          <rect x="434" y="250" width="10" height="16" opacity="0.85"/>
+          <rect x="372" y="278" width="10" height="16" opacity="0.9"/>
+          <rect x="394" y="278" width="10" height="16" opacity="0.95"/>
+          <rect x="416" y="278" width="10" height="16" opacity="0.85"/>
+          <rect x="434" y="278" width="10" height="16" opacity="0.9"/>
+        </g>
+        <!-- Tree mid -->
+        <ellipse cx="490" cy="298" rx="24" ry="30" fill="#15803D"/>
+        <rect x="486" y="310" width="8" height="20" fill="#44403C"/>
+        <!-- SRH University badge/card -->
+        <g transform="translate(620, 140)">
+          <rect width="320" height="180" rx="14" fill="#ffffff" stroke="#E2E8F0" stroke-width="1.5"/>
+          <!-- German flag strip header -->
+          <rect y="0" width="320" height="34" rx="14" fill="#B91C1C"/>
+          <rect y="20" width="320" height="14" fill="#B91C1C"/>
+          <text x="160" y="23" font-family="Poppins,sans-serif" font-size="14" font-weight="700" letter-spacing="2" text-anchor="middle" fill="#FFCF00">STUDY IN GERMANY</text>
+          <!-- Logo text -->
+          <text x="160" y="76" font-family="Poppins,sans-serif" font-size="30" font-weight="800" text-anchor="middle" fill="#B91C1C">SRH University</text>
+          <text x="160" y="100" font-family="Poppins,sans-serif" font-size="13" font-weight="500" text-anchor="middle" fill="#475569">Admission Day · Chennai · 14 Nov 2026</text>
+          <!-- Divider -->
+          <line x1="40" y1="118" x2="280" y2="118" stroke="#E2E8F0" stroke-width="1"/>
+          <!-- Programme line -->
+          <text x="160" y="146" font-family="Poppins,sans-serif" font-size="13" font-weight="600" text-anchor="middle" fill="#0F172A">Master's &amp; selected Bachelor's</text>
+          <text x="160" y="164" font-family="Poppins,sans-serif" font-size="11" text-anchor="middle" fill="#64748B">Meet the admissions team in person</text>
+        </g>
+        <!-- Student silhouettes walking -->
+        <g fill="#334155">
+          <g transform="translate(540,282)">
+            <circle cx="0" cy="0" r="6"/>
+            <rect x="-5" y="6" width="10" height="20" rx="2"/>
+            <rect x="-8" y="10" width="4" height="12" rx="1" fill="#B91C1C"/>
+          </g>
+          <g transform="translate(560,284)">
+            <circle cx="0" cy="0" r="6"/>
+            <rect x="-5" y="6" width="10" height="18" rx="2"/>
+          </g>
+          <g transform="translate(980,285)">
+            <circle cx="0" cy="0" r="6"/>
+            <rect x="-5" y="6" width="10" height="20" rx="2"/>
+            <rect x="4" y="10" width="4" height="12" rx="1" fill="#FFCF00"/>
+          </g>
+          <g transform="translate(998,287)">
+            <circle cx="0" cy="0" r="6"/>
+            <rect x="-5" y="6" width="10" height="18" rx="2"/>
+          </g>
+        </g>
+        <!-- Floating graduation cap -->
+        <g transform="translate(90,130) rotate(-10)">
+          <polygon points="-28,8 0,-5 28,8 0,21" fill="#0F172A"/>
+          <ellipse cx="0" cy="18" rx="18" ry="5" fill="#0F172A"/>
+          <path d="M 23 7 Q 32 14 28 24" stroke="#FFCF00" stroke-width="2.2" fill="none"/>
+          <circle cx="28" cy="24" r="4" fill="#FFCF00"/>
+        </g>
+        <!-- Right side tree -->
+        <ellipse cx="1130" cy="290" rx="32" ry="38" fill="#166534"/>
+        <rect x="1126" y="302" width="8" height="26" fill="#44403C"/>
+      </svg>
+    </div>
+    <p class="visual-caption">SRH Admission Day · Chennai, India · 14 November 2026</p>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Why Attend</span>
+      <h2>Take the Next Step Towards Studying in Germany</h2>
+      <p>Choosing a university and programme involves more than finding a course that interests you. You also need to understand the entry requirements, available intakes, campus options, and application process.</p>
+      <p style="margin-top:12px">At SRH Admission Day Chennai, prospective students can discuss these questions with the admissions team and explore potential study options based on their academic qualifications and goals.</p>
+    </div>
+    <div class="features">
+      <div class="feature"><div class="feature-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div><h3>Explore Master's Programmes</h3><p>Discover postgraduate study options and discuss how they align with your academic background and career interests.</p></div>
+      <div class="feature"><div class="feature-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div><h3>Explore Selected Bachelor's Programmes</h3><p>Learn about undergraduate options, entry requirements, and relevant application pathways.</p></div>
+      <div class="feature"><div class="feature-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><h3>Discuss Your Academic Profile</h3><p>Share your qualifications and preferred field of study to understand which programmes may be worth exploring further.</p></div>
+      <div class="feature"><div class="feature-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div><h3>Understand the Application Process</h3><p>Get guidance on programme requirements, supporting documents, and the next steps in applying to SRH University.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band band-soft">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Programmes</span>
+      <h2>Explore Programmes at SRH University</h2>
+      <p>Master's programmes are the primary focus of this event, with selected Bachelor's programmes also available for eligible applicants.</p>
+    </div>
+    <input type="radio" name="ysrh-tab" id="ysrh-t-m" class="tab-radio" checked>
+    <input type="radio" name="ysrh-tab" id="ysrh-t-b" class="tab-radio">
+    <div class="tabs-wrap">
+      <div class="prog-tabs">
+        <label for="ysrh-t-m" class="prog-tab">Master's Programmes</label>
+        <label for="ysrh-t-b" class="prog-tab">Bachelor's Programmes</label>
+      </div>
+    </div>
+    <div class="prog-panel" id="panel-masters">
+      <div class="prog-intro">
+        <h3>Explore Master's Programmes at SRH University</h3>
+        <p>If you are planning your next academic or professional step, a Master's degree can help you deepen your subject knowledge or explore a new specialisation.</p>
+        <p>Use SRH Admission Day Chennai to discuss your qualifications, academic interests, and potential programme options with the admissions team.</p>
+        <p>Explore the university's available fields of study, which include areas such as:</p>
+      </div>
+      <div class="fields-grid">
+        <div class="field-card"><div class="fc-icon">⚖</div><div class="fc-text">Business and Law</div></div>
+        <div class="field-card"><div class="fc-icon">💻</div><div class="fc-text">Computer Science and Data Science</div></div>
+        <div class="field-card"><div class="fc-icon">🏗</div><div class="fc-text">Engineering, Sustainability, and Architecture</div></div>
+        <div class="field-card"><div class="fc-icon">🧠</div><div class="fc-text">Psychology and Therapy</div></div>
+        <div class="field-card"><div class="fc-icon">📦</div><div class="fc-text">Supply Chain Management</div></div>
+        <div class="field-card"><div class="fc-icon">🎨</div><div class="fc-text">Arts, Design, and Music</div></div>
+        <div class="field-card"><div class="fc-icon">⚕</div><div class="fc-text">Health, Sport, Education, and Social Work</div></div>
+        <div class="field-card"><div class="fc-icon">🏨</div><div class="fc-text">Hospitality</div></div>
+      </div>
+      <p class="prog-note"><strong>Please note:</strong> Programme availability, language of instruction, campus location, intake, and eligibility requirements vary by course. The admissions team will confirm which Master's programmes are available for this event.</p>
+      <div class="panel-cta"><a href="#register" class="btn btn-primary">Register for Admission Day →</a></div>
+    </div>
+    <div class="prog-panel" id="panel-bachelors">
+      <div class="prog-intro">
+        <h3>Discover Selected Bachelor's Programmes</h3>
+        <p>Planning to begin your higher education in Germany? SRH Admission Day Chennai will also feature selected Bachelor's options for students who meet the relevant entry requirements.</p>
+        <p>Discuss your academic qualifications, preferred subject and intended intake with the admissions team to understand which undergraduate programmes may be relevant to your plans.</p>
+      </div>
+      <div class="fields-grid">
+        <div class="field-card"><div class="fc-icon">🎨</div><div class="fc-text">Arts, Design &amp; Music</div></div>
+        <div class="field-card"><div class="fc-icon">⚖</div><div class="fc-text">Business &amp; Law</div></div>
+        <div class="field-card"><div class="fc-icon">📢</div><div class="fc-text">Communication, Media &amp; Marketing</div></div>
+        <div class="field-card"><div class="fc-icon">💻</div><div class="fc-text">Computer &amp; Data Science</div></div>
+        <div class="field-card"><div class="fc-icon">🏗</div><div class="fc-text">Engineering, Sustainability &amp; Architecture</div></div>
+        <div class="field-card"><div class="fc-icon">⚕</div><div class="fc-text">Health, Sport, Education &amp; Social Work</div></div>
+        <div class="field-card"><div class="fc-icon">🏨</div><div class="fc-text">Hospitality</div></div>
+        <div class="field-card"><div class="fc-icon">🧠</div><div class="fc-text">Psychology &amp; Therapy</div></div>
+        <div class="field-card"><div class="fc-icon">📦</div><div class="fc-text">Supply Chain Management</div></div>
+      </div>
+      <p class="prog-note"><strong>Please note:</strong> Only Bachelor's programmes confirmed for the Chennai event will be discussed. Applicants should also verify the specific academic, language, and other entry requirements for their chosen course.</p>
+      <div class="panel-cta"><a href="#register" class="btn btn-primary">Register for Admission Day →</a></div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="decision">
+      <div>
+        <span class="eyebrow">On the Day</span>
+        <h2>Could You Receive an Admission Decision on the Day?</h2>
+        <p><span class="highlight">Eligible applicants may be considered for same-day admission,</span> subject to the university's admission process and the requirements of the selected programme.</p>
+        <p>The outcome may depend on programme availability, academic eligibility, document verification, and whether all required application steps have been completed.</p>
+        <p style="font-size:13px;color:var(--muted);background:var(--soft);padding:12px 16px;border-radius:8px;border-left:3px solid var(--yg-yellow);margin-top:20px"><strong>Please note:</strong> Same-day admission is not guaranteed. Some applicants may need to submit additional documents, complete further assessments, or follow up with the admissions team after the event.</p>
+        <p style="font-size:13px;color:var(--muted)">A profile evaluation is an opportunity to discuss your qualifications and potential programme suitability. It should not be treated as a formal admission offer or a guarantee of eligibility.</p>
+      </div>
+      <div class="decision-stat"><div class="big">14 Nov</div><div class="label">SRH Admission Day<br>Chennai, India · 2026</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="band band-soft">
+  <div class="wrap">
+    <div class="section-head"><span class="eyebrow">How It Works</span><h2>How SRH Admission Day Works</h2></div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><h3>Register your interest</h3><p>Share your contact details, preferred degree level, and area of study through the event registration form.</p></div>
+      <div class="step"><div class="step-num">2</div><h3>Meet the admissions team</h3><p>Discuss your academic background, qualifications and plans for studying in Germany.</p></div>
+      <div class="step"><div class="step-num">3</div><h3>Explore relevant programmes</h3><p>Review suitable options, subject to the programmes confirmed for the event, and understand their entry requirements.</p></div>
+      <div class="step"><div class="step-num">4</div><h3>Discuss your profile</h3><p>Learn about your potential eligibility and identify any additional information or documentation that may be required.</p></div>
+      <div class="step"><div class="step-num">5</div><h3>Understand your next steps</h3><p>Get guidance on the application process and, where applicable, whether you can be considered for an admission decision on the day.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="visual-band visual-band-soft">
+  <div class="visual-wrap">
+    <div class="cities-strip">
+      <div class="cities-head"><h3>Study in Germany</h3><p>Campus location varies by programme. Ask the admissions team where your preferred course is offered.</p></div>
+            <svg viewBox="0 0 1100 240" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-labelledby="viz2-title" role="img">
+        <title id="viz2-title">Famous German cities skyline — Berlin, Heidelberg, Munich, Cologne, Hamburg</title>
+        <!-- Baseline -->
+        <line x1="0" y1="190" x2="1100" y2="190" stroke="#CBD5E1" stroke-width="2" stroke-dasharray="4 4"/>
+
+        <!-- BERLIN: Brandenburg Gate -->
+        <g transform="translate(60,70)" fill="#0F172A">
+          <!-- Columns -->
+          <rect x="0" y="30" width="10" height="90"/>
+          <rect x="18" y="30" width="10" height="90"/>
+          <rect x="36" y="30" width="10" height="90"/>
+          <rect x="54" y="30" width="10" height="90"/>
+          <rect x="72" y="30" width="10" height="90"/>
+          <rect x="90" y="30" width="10" height="90"/>
+          <!-- Base -->
+          <rect x="-6" y="118" width="112" height="12"/>
+          <!-- Top entablature -->
+          <rect x="-6" y="20" width="112" height="12"/>
+          <rect x="-10" y="12" width="120" height="10"/>
+          <!-- Quadriga -->
+          <rect x="38" y="0" width="24" height="12" fill="#B91C1C"/>
+          <circle cx="50" cy="-4" r="3" fill="#FFCF00"/>
+        </g>
+        <text x="110" y="215" font-family="Poppins,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#0F172A" letter-spacing="1">BERLIN</text>
+
+        <!-- HEIDELBERG: Castle -->
+        <g transform="translate(240,80)" fill="#0F172A">
+          <rect x="0" y="40" width="140" height="70"/>
+          <!-- Towers -->
+          <rect x="-5" y="20" width="25" height="90"/>
+          <polygon points="-5,20 7.5,0 20,20" fill="#B91C1C"/>
+          <rect x="120" y="20" width="25" height="90"/>
+          <polygon points="120,20 132.5,0 145,20" fill="#B91C1C"/>
+          <!-- Center -->
+          <rect x="55" y="10" width="30" height="30"/>
+          <polygon points="55,10 70,-6 85,10" fill="#B91C1C"/>
+          <!-- Windows -->
+          <rect x="20" y="55" width="8" height="14" fill="#FFCF00"/>
+          <rect x="38" y="55" width="8" height="14" fill="#FFCF00"/>
+          <rect x="56" y="55" width="8" height="14" fill="#FFCF00"/>
+          <rect x="74" y="55" width="8" height="14" fill="#FFCF00"/>
+          <rect x="92" y="55" width="8" height="14" fill="#FFCF00"/>
+          <rect x="110" y="55" width="8" height="14" fill="#FFCF00"/>
+          <rect x="55" y="80" width="30" height="30" fill="#B91C1C"/>
+        </g>
+        <text x="312" y="215" font-family="Poppins,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#0F172A" letter-spacing="1">HEIDELBERG</text>
+
+        <!-- MUNICH: Frauenkirche twin towers -->
+        <g transform="translate(430,50)" fill="#0F172A">
+          <!-- Main body -->
+          <rect x="20" y="80" width="110" height="60"/>
+          <!-- Twin towers -->
+          <rect x="10" y="20" width="35" height="120"/>
+          <rect x="105" y="20" width="35" height="120"/>
+          <!-- Onion domes -->
+          <ellipse cx="27.5" cy="18" rx="19" ry="14" fill="#15803D"/>
+          <polygon points="27.5,4 22,12 33,12" fill="#15803D"/>
+          <circle cx="27.5" cy="2" r="2.5" fill="#FFCF00"/>
+          <ellipse cx="122.5" cy="18" rx="19" ry="14" fill="#15803D"/>
+          <polygon points="122.5,4 117,12 128,12" fill="#15803D"/>
+          <circle cx="122.5" cy="2" r="2.5" fill="#FFCF00"/>
+          <!-- Clock -->
+          <circle cx="27.5" cy="55" r="7" fill="#FFCF00"/>
+          <circle cx="122.5" cy="55" r="7" fill="#FFCF00"/>
+          <!-- Windows -->
+          <rect x="30" y="95" width="10" height="20" fill="#FFCF00"/>
+          <rect x="50" y="95" width="10" height="20" fill="#FFCF00"/>
+          <rect x="70" y="95" width="20" height="40" fill="#B91C1C"/>
+          <rect x="100" y="95" width="10" height="20" fill="#FFCF00"/>
+        </g>
+        <text x="505" y="215" font-family="Poppins,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#0F172A" letter-spacing="1">MÜNCHEN</text>
+
+        <!-- COLOGNE: Cathedral twin spires -->
+        <g transform="translate(620,30)" fill="#0F172A">
+          <rect x="30" y="110" width="80" height="30"/>
+          <rect x="55" y="90" width="30" height="20"/>
+          <!-- Twin spires -->
+          <polygon points="25,160 25,60 35,20 45,60 45,160"/>
+          <polygon points="95,160 95,60 105,20 115,60 115,160"/>
+          <!-- Spire tips -->
+          <polygon points="30,25 35,0 40,25"/>
+          <polygon points="100,25 105,0 110,25"/>
+          <!-- Rose window -->
+          <circle cx="70" cy="100" r="8" fill="#B91C1C"/>
+          <!-- Doors -->
+          <rect x="40" y="120" width="12" height="20" fill="#FFCF00"/>
+          <rect x="60" y="118" width="20" height="22" fill="#FFCF00"/>
+          <rect x="88" y="120" width="12" height="20" fill="#FFCF00"/>
+          <!-- Decorative crosses -->
+          <rect x="34" y="-8" width="2" height="10"/>
+          <rect x="31" y="-5" width="8" height="2"/>
+          <rect x="104" y="-8" width="2" height="10"/>
+          <rect x="101" y="-5" width="8" height="2"/>
+        </g>
+        <text x="690" y="215" font-family="Poppins,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#0F172A" letter-spacing="1">KÖLN</text>
+
+        <!-- HAMBURG: Elbphilharmonie / port cranes -->
+        <g transform="translate(800,70)" fill="#0F172A">
+          <!-- Base (brick) -->
+          <rect x="0" y="60" width="160" height="60"/>
+          <!-- Top wave structure -->
+          <path d="M 0 60 Q 40 10 80 40 Q 120 10 160 50 L 160 60 Z" fill="#1E293B"/>
+          <!-- Windows -->
+          <g fill="#FFCF00">
+            <rect x="10" y="75" width="8" height="12"/>
+            <rect x="26" y="75" width="8" height="12"/>
+            <rect x="42" y="75" width="8" height="12"/>
+            <rect x="58" y="75" width="8" height="12"/>
+            <rect x="74" y="75" width="8" height="12"/>
+            <rect x="90" y="75" width="8" height="12"/>
+            <rect x="106" y="75" width="8" height="12"/>
+            <rect x="122" y="75" width="8" height="12"/>
+            <rect x="138" y="75" width="8" height="12"/>
+            <rect x="10" y="95" width="8" height="12"/>
+            <rect x="26" y="95" width="8" height="12" opacity="0.9"/>
+            <rect x="42" y="95" width="8" height="12"/>
+            <rect x="58" y="95" width="8" height="12" opacity="0.9"/>
+            <rect x="74" y="95" width="8" height="12"/>
+            <rect x="90" y="95" width="8" height="12" opacity="0.9"/>
+            <rect x="106" y="95" width="8" height="12"/>
+            <rect x="122" y="95" width="8" height="12" opacity="0.9"/>
+            <rect x="138" y="95" width="8" height="12"/>
+          </g>
+          <!-- Port crane -->
+          <g transform="translate(-30,0)">
+            <rect x="0" y="30" width="4" height="90"/>
+            <line x1="2" y1="30" x2="30" y2="30" stroke="#0F172A" stroke-width="3"/>
+            <line x1="30" y1="30" x2="30" y2="50" stroke="#B91C1C" stroke-width="2"/>
+            <rect x="26" y="50" width="8" height="4" fill="#B91C1C"/>
+          </g>
+        </g>
+        <text x="880" y="215" font-family="Poppins,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#0F172A" letter-spacing="1">HAMBURG</text>
+
+        <!-- DRESDEN: Simple church silhouette -->
+        <g transform="translate(1000,100)" fill="#0F172A">
+          <rect x="10" y="40" width="60" height="60"/>
+          <rect x="30" y="10" width="20" height="30"/>
+          <polygon points="30,10 40,-10 50,10"/>
+          <circle cx="40" cy="-14" r="2.5" fill="#FFCF00"/>
+          <rect x="18" y="55" width="10" height="18" fill="#FFCF00"/>
+          <rect x="35" y="55" width="10" height="18" fill="#FFCF00"/>
+          <rect x="52" y="55" width="10" height="18" fill="#FFCF00"/>
+          <rect x="30" y="78" width="20" height="22" fill="#B91C1C"/>
+        </g>
+        <text x="1040" y="215" font-family="Poppins,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#0F172A" letter-spacing="1">DRESDEN</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="evt">
+      <div>
+        <span class="eyebrow" style="background:var(--yg-yellow)">Event Details</span>
+        <h2>SRH Admission Day Chennai 2026 Event Details</h2>
+        <p>Please check this page for confirmed event details and registration instructions before attending.</p>
+        <ul class="evt-list">
+          <li><div class="ei"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="ei-text"><div class="et">Date</div><div class="ev">Saturday, 14 November 2026</div></div></li>
+          <li><div class="ei"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div class="ei-text"><div class="et">City</div><div class="ev">Chennai, India</div></div></li>
+          <li><div class="ei"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div><div class="ei-text"><div class="et">Venue and address</div><div class="ev">To be announced</div></div></li>
+          <li><div class="ei"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="ei-text"><div class="et">Event timings</div><div class="ev">To be announced</div></div></li>
+          <li><div class="ei"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></div><div class="ei-text"><div class="et">Registration</div><div class="ev">Online registration through the form on this page</div></div></li>
+        </ul>
+      </div>
+      <div class="evt-cta">
+        <div class="date-block" aria-label="Saturday 14 November 2026"><div><b>SAT</b><span>Day</span></div><div><b>14</b><span>Date</span></div><div><b>NOV</b><span>Month</span></div><div><b>2026</b><span>Year</span></div></div>
+        <a href="#register" class="btn btn-primary">Register for Admission Day →</a>
+        <p class="sub">Venue and timings will be shared once confirmed.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band band-soft">
+  <div class="wrap">
+    <div class="register">
+      <span class="eyebrow">Register</span>
+      <h2>Register for SRH Admission Day Chennai</h2>
+      <p>Tell us about your academic background and study interests so the admissions team can direct your enquiry towards relevant programme options.</p>
+      <a href="#register" class="btn btn-primary">Register Your Interest →</a>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="section-head"><span class="eyebrow">FAQ</span><h2>Frequently Asked Questions</h2></div>
+    <div class="faq">
+      <details class="faq-item" open>
+        <summary>Who should attend SRH Admission Day Chennai?</summary>
+        <div class="faq-body">Students planning to pursue higher education in Germany and exploring suitable SRH University programmes.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Can I discuss more than one programme?</summary>
+        <div class="faq-body">Yes. You can discuss your preferred fields of study and ask which programmes may align with your academic background.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Which intake should I apply for?</summary>
+        <div class="faq-body">The suitable intake depends on your chosen programme, eligibility, and application timeline. Check the relevant programme page for current intake details.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Can I attend if I have not finalised my course?</summary>
+        <div class="faq-body">Yes. The event can help you explore relevant study options before deciding which programme to pursue.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Can I ask about application deadlines and intakes?</summary>
+        <div class="faq-body">Yes. You can ask about relevant application timelines, available intakes, and the next steps for your preferred programme.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Will I receive guidance on the application process?</summary>
+        <div class="faq-body">You can discuss the application process and clarify the steps you may need to complete after the event.</div>
+      </details>
+      <details class="faq-item">
+        <summary>How can I prepare for the event?</summary>
+        <div class="faq-body">Review your academic history, shortlist your preferred fields, and prepare questions about eligibility, intakes, and application requirements.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Which documents should I bring?</summary>
+        <div class="faq-body">Carry your available academic transcripts, degree certificates and identification. Check with the event team for the confirmed document checklist and any programme-specific requirements.</div>
+      </details>
+      <details class="faq-item">
+        <summary>Can I ask about English language requirements?</summary>
+        <div class="faq-body">Yes. You can ask about the English language proficiency requirements for your preferred programme and which forms of proof may be accepted.</div>
+      </details>
+      <details class="faq-item">
+        <summary>How can I register for the event?</summary>
+        <div class="faq-body">Complete the registration form on this page once registration is enabled. Further instructions, including the confirmed venue and event timings, will be shared as they become available.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section class="band" style="padding-top:0">
+  <div class="wrap">
+    <div class="cta-final">
+      <h2>Your Next Chapter Starts with a Conversation</h2>
+      <p>Explore your postgraduate options, discuss your academic profile, and understand the steps involved in applying to SRH University.</p>
+      <p>Join us in Chennai on 14 November 2026 and take a more informed step towards your study plans in Germany.</p>
+      <a href="#register" class="btn btn-primary">Register for SRH Admission Day →</a>
+    </div>
+    <p class="legal" style="margin-top:28px">Event participation does not guarantee admission. Programme availability, eligibility, and admission outcomes are subject to SRH University's applicable requirements and confirmation.</p>
+  </div>
+</section>
+
+</div>
