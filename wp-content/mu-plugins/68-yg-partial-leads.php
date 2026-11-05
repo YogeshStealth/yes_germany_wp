@@ -2,7 +2,7 @@
 /**
  * Plugin Name: YG Partial Leads
  * Description: Saves what a visitor types into the enquiry forms before they press Submit. A draft that is never submitted becomes a partial lead and is sent to the CRM (saveDetails, 8443) after a quiet period. Submitted drafts are only marked; the normal lead goes through exactly as before.
- * Version:     1.0.0
+ * Version:     1.1.0
  * Author:      Stealth Digital
  *
  * Asked for on 2026-11-05: "capture lead even when people dont submit ... when
@@ -13,7 +13,8 @@
  * Flow
  * ----
  * 1. Browser: on the Enquiry Form (139211) and the influencer form (139425),
- *    once the phone has 10+ digits, the form's fields are posted to
+ *    once every field except branch is filled (name, valid email, 10+ digit
+ *    phone, level, intake, state), the form's fields are posted to
  *    /wp-json/yg/v1/partial-lead about a second after the visitor stops typing,
  *    and again when the tab is hidden. One random draft id per form per browser,
  *    so every save overwrites the same row - never a new one.
@@ -22,8 +23,9 @@
  *    is stored and sent to 8443 by YG Lead Capture and mu 45 exactly as before.
  * 3. No submit: `wp yg-partial-push` (system cron, every 5 minutes) sends drafts
  *    untouched for YG_PARTIAL_PUSH_AFTER seconds to saveDetails, built by the
- *    same code that rebuilds stored leads (mu 59), with form_title
- *    "<form> - Partial (not submitted)" and lead_type "partial".
+ *    same code that rebuilds stored leads (mu 59). Since 1.1.0 it goes exactly
+ *    like a normal lead - same form title, no partial marker - at the user's
+ *    request ("we dont wanna know if its partial or not").
  *
  * Kept apart from wpb9_yg_leads on purpose: that table feeds the lead counts,
  * the duplicate checks, the daily check (63) and the 8443 safety net (59). A
@@ -196,6 +198,34 @@ function yg_partial_digits( $phone ) {
 }
 
 /**
+ * Fields a draft must have before it is saved or sent: everything the form
+ * requires except branch.
+ *
+ * @return string[]
+ */
+function yg_partial_required_keys() {
+	return (array) apply_filters( 'yg_partial_required_keys', array( 'full_name', 'email', 'phone', 'level_of_education', 'preferred_intake_of_pursuing', 'state' ) );
+}
+
+/**
+ * Whether a set of form fields is complete enough to be a lead.
+ *
+ * @param array $fields Form fields.
+ * @return bool
+ */
+function yg_partial_complete( array $fields ) {
+	foreach ( yg_partial_required_keys() as $k ) {
+		$v = isset( $fields[ $k ] ) ? $fields[ $k ] : '';
+		$v = is_array( $v ) ? (string) reset( $v ) : (string) $v;
+		if ( '' === trim( $v ) ) {
+			return false;
+		}
+	}
+	return is_email( is_array( $fields['email'] ) ? reset( $fields['email'] ) : $fields['email'] )
+		&& strlen( yg_partial_digits( is_array( $fields['phone'] ) ? reset( $fields['phone'] ) : $fields['phone'] ) ) >= 10;
+}
+
+/**
  * REST: create or overwrite the draft for a token.
  *
  * @param WP_REST_Request $req Request.
@@ -221,8 +251,8 @@ function yg_partial_rest_save( WP_REST_Request $req ) {
 
 	$fields = yg_partial_clean_fields( $req->get_param( 'fields' ) );
 	$phone  = isset( $fields['phone'] ) && is_scalar( $fields['phone'] ) ? (string) $fields['phone'] : '';
-	if ( strlen( yg_partial_digits( $phone ) ) < 10 ) {
-		return new WP_REST_Response( array( 'ok' => false, 'why' => 'no phone yet' ), 200 );
+	if ( ! yg_partial_complete( $fields ) ) {
+		return new WP_REST_Response( array( 'ok' => false, 'why' => 'incomplete' ), 200 );
 	}
 
 	$existing = $wpdb->get_row( $wpdb->prepare( "SELECT id, status FROM $t WHERE token = %s", $token ), ARRAY_A );
@@ -383,8 +413,16 @@ function yg_partial_push_run( $dry_run = false, $out = null ) {
 			continue;
 		}
 
-		$row = json_decode( (string) $p['row_json'], true );
-		$row = is_array( $row ) ? $row : array();
+		$row    = json_decode( (string) $p['row_json'], true );
+		$row    = is_array( $row ) ? $row : array();
+		$fields = json_decode( (string) ( $row['fields_json'] ?? '' ), true );
+		if ( ! is_array( $fields ) || ! yg_partial_complete( $fields ) ) {
+			$out( sprintf( 'SKIP partial %d: incomplete', $p['id'] ) );
+			if ( ! $dry_run ) {
+				$wpdb->update( $t, array( 'status' => 'incomplete' ), array( 'id' => (int) $p['id'] ) );
+			}
+			continue;
+		}
 		$row = array_merge(
 			array( 'id' => 0, 'fields_json' => '{}', 'page_url' => '', 'referrer' => '', 'user_agent' => '', 'ip' => '', 'landing_page' => '', 'gclid' => '', 'fbclid' => '' ),
 			$row,
@@ -395,9 +433,8 @@ function yg_partial_push_run( $dry_run = false, $out = null ) {
 			$out( 'mu-plugins 45/59 missing - nothing sent' );
 			break;
 		}
-		$payload               = yg_lead_crm_payload_from_lead( $row );
-		$payload['form_title'] = $p['form_title'] . ' - Partial (not submitted)';
-		$payload['lead_type']  = 'partial';
+		// Exactly what a normal submission sends: same form title, no partial marker.
+		$payload = yg_lead_crm_payload_from_lead( $row );
 		unset( $payload['resubmitted_at'] );
 
 		if ( $dry_run ) {
@@ -491,9 +528,18 @@ function yg_partial_script() {
 			} );
 			return out;
 		}
+		/* Everything the form needs except branch: name, valid email, 10+ digit phone, level, intake, state. */
+		var NEED = ['full_name','email','phone','level_of_education','preferred_intake_of_pursuing','state'];
+		function complete( f ) {
+			for ( var i = 0; i < NEED.length; i++ ) {
+				var v = f[ NEED[ i ] ]; v = Array.isArray( v ) ? v[0] : v;
+				if ( ! v || ! String( v ).trim() ) { return false; }
+			}
+			return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test( String( f.email ).trim() ) && String( f.phone ).replace( /\D/g, '' ).length >= 10;
+		}
 		function save( form ) {
-			var f = fields( form ), ph = String( f.phone || '' ).replace( /\D/g, '' );
-			if ( ph.length < 10 ) { return; }
+			var f = fields( form );
+			if ( ! complete( f ) ) { return; }
 			var body = JSON.stringify( { token: token( form ), form_id: formId( form ), page_url: location.href, fields: f } );
 			if ( body === form.__ygLast ) { return; }
 			form.__ygLast = body;
@@ -579,13 +625,14 @@ function yg_partial_admin_page() {
 	$labels = array(
 		'open'      => 'Typing / waiting (not sent yet)',
 		'submitted' => 'Submitted - normal lead',
-		'sent'      => 'Partial - sent to CRM',
+		'sent'      => 'Not submitted - sent to CRM',
+		'incomplete'=> 'Incomplete - not sent',
 		'failed'    => 'Partial - CRM failed',
 		'duplicate' => 'Partial - same phone already sent',
 		'expired'   => 'Expired',
 	);
 	echo '<div class="wrap"><h1>Partial leads</h1>';
-	echo '<p>What visitors typed into the Enquiry and influencer forms. A draft that is not submitted within ' . (int) ( YG_PARTIAL_PUSH_AFTER / 60 ) . ' minutes is sent to the CRM as "&lt;form&gt; - Partial (not submitted)". Times are UTC.</p><p>';
+	echo '<p>What visitors typed into the Enquiry and influencer forms. Saved once every field except branch is filled. A draft that is not submitted within ' . (int) ( YG_PARTIAL_PUSH_AFTER / 60 ) . ' minutes is sent to the CRM like a normal lead. Times are UTC.</p><p>';
 	foreach ( $counts as $c ) {
 		echo '<strong>' . esc_html( $labels[ $c['status'] ] ?? $c['status'] ) . ':</strong> ' . (int) $c['n'] . ' &nbsp; ';
 	}
