@@ -2,7 +2,7 @@
 /**
  * Plugin Name: YG Partial Leads
  * Description: Saves what a visitor types into the enquiry forms before they press Submit. A draft that is never submitted becomes a partial lead and is sent to the CRM (saveDetails, 8443) after a quiet period. Submitted drafts are only marked; the normal lead goes through exactly as before.
- * Version:     1.1.0
+ * Version:     1.1.1
  * Author:      Stealth Digital
  *
  * Asked for on 2026-11-05: "capture lead even when people dont submit ... when
@@ -257,8 +257,10 @@ function yg_partial_rest_save( WP_REST_Request $req ) {
 
 	$existing = $wpdb->get_row( $wpdb->prepare( "SELECT id, status FROM $t WHERE token = %s", $token ), ARRAY_A );
 	if ( $existing && 'open' !== $existing['status'] ) {
-		// Already submitted or sent: never overwrite what was delivered.
-		return new WP_REST_Response( array( 'ok' => true, 'status' => $existing['status'] ), 200 );
+		// Already submitted or sent: never overwrite what was delivered. The
+		// browser starts a new draft when it sees `restart` (1.1.1) - otherwise a
+		// returning visitor's next enquiry was silently ignored.
+		return new WP_REST_Response( array( 'ok' => false, 'status' => $existing['status'], 'restart' => true ), 200 );
 	}
 
 	$page = esc_url_raw( (string) $req->get_param( 'page_url' ) );
@@ -537,14 +539,20 @@ function yg_partial_script() {
 			}
 			return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test( String( f.email ).trim() ) && String( f.phone ).replace( /\D/g, '' ).length >= 10;
 		}
-		function save( form ) {
+		function save( form, retry ) {
 			var f = fields( form );
 			if ( ! complete( f ) ) { return; }
 			var body = JSON.stringify( { token: token( form ), form_id: formId( form ), page_url: location.href, fields: f } );
 			if ( body === form.__ygLast ) { return; }
 			form.__ygLast = body;
 			try {
-				fetch( CFG.url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true, credentials: 'same-origin' } ).catch( function () {} );
+				fetch( CFG.url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true, credentials: 'same-origin' } )
+					.then( function ( r ) { return r.json(); } )
+					.then( function ( d ) {
+						/* That draft was already submitted or sent: start a fresh one, once. */
+						if ( d && d.restart && ! retry ) { form.__ygLast = ''; token( form, true ); save( form, true ); }
+					} )
+					.catch( function () {} );
 			} catch ( e ) {}
 		}
 		function managed( form ) {
