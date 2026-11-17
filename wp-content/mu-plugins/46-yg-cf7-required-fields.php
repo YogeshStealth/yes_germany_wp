@@ -7,7 +7,7 @@
  *              after a server round trip. Mirroring the attribute means an
  *              incomplete form cannot be sent at all - no request to WordPress,
  *              and nothing for the CRM to receive.
- * Version:     1.2.0
+ * Version:     1.3.0
  * Author:      Stealth Digital
  *
  * Elementor Pro needs none of this: it already renders required="required" on
@@ -48,6 +48,13 @@
  *     name, email, phone, state, branch, study level, intake
  *     (yg_cf7_reorder_enquiry_form()).
  * Asked for by the user. mh and the German pages keep the old order and rules.
+ *
+ * 1.3.0 (2026-11-17): mh.yesgermany.com is treated like the homepage (client
+ * approval): same order, branch / study level / intake optional. mh already
+ * drew the homepage form (it is fetched from this site), but its submissions
+ * were still validated with the old rules. Only the German-language course
+ * pages keep the old order and required fields. Mail routing (53 / 58) is
+ * unchanged.
  *
  * Note `branchIsRequired()` in yg-form-popup-v2 is hardcoded to return false,
  * so that plugin's own branch gating never fires. This replaces it properly.
@@ -120,9 +127,10 @@ function yg_cf7_is_german_language_page( $post_id ) {
 /**
  * Whether the branch field must be filled for this render or submission.
  *
- * Since 5 Nov 2026 branch is optional everywhere except:
- *   - submissions from mh.yesgermany.com (its own form requires it);
- *   - the German-language course pages, in-page form and popup alike.
+ * Since 5 Nov 2026 branch is optional everywhere except the German-language
+ * course pages, in-page form and popup alike. mh.yesgermany.com submissions
+ * follow the homepage rules since 17 Nov 2026 (1.3.0); its form is the
+ * homepage form, fetched through mu-plugin 40.
  *
  * The page is found the same way when the form is drawn and when it is sent,
  * so the browser and the server never disagree:
@@ -133,10 +141,6 @@ function yg_cf7_is_german_language_page( $post_id ) {
  * @return bool
  */
 function yg_cf7_branch_required_here() {
-	if ( function_exists( 'yg_mh_mail_is_mh_submission' ) && yg_mh_mail_is_mh_submission() ) {
-		return true;
-	}
-
 	$post_id = 0;
 	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- read-only routing hint; CF7 verifies the submission.
@@ -225,7 +229,7 @@ function yg_cf7_force_required_tag( $tag ) {
 }
 
 /**
- * Fields that are optional on the main site but required on mh and the
+ * Fields that are optional on the main site (and mh) but required on the
  * German-language course pages. Keyed by CF7 form ID.
  *
  * Only the Enquiry Form: the influencer form (139425) keeps its rules.
@@ -286,7 +290,7 @@ add_filter( 'wpcf7_form_elements', 'yg_cf7_reorder_enquiry_form', 20, 1 );
 /**
  * Move Study Level and Intake below Branch on the main site.
  *
- * The form content itself is left as it is (mh and the German pages keep the
+ * The form content itself is left as it is (the German pages keep the
  * old order, and a content push from staging cannot undo this). Works on the
  * rendered field paragraphs; if any of the four cannot be found exactly once
  * the markup is returned untouched, so a form edit can never break the form.
