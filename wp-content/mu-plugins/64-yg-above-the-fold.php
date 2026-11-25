@@ -18,8 +18,19 @@
  *              - fonts are served from this site (Elementor > Settings > Performance >
  *                "Load Google Fonts Locally", switched on 19 Oct 2026), and the Poppins
  *                files the top of the page needs are preloaded.
+ *
+ *              1.1.0 (25 Nov 2026) - section backgrounds at the top of the page:
+ *              Elementor hides the background picture of every top-level section from
+ *              the third one down (the fourth on tall screens) until its lazy-load
+ *              script has run, and on phones that script runs late. The homepage's
+ *              mobile hero is such a section: Lighthouse (mobile) measured its picture
+ *              starting 7.4 s after the page. The first three top-level sections of the
+ *              page now carry Elementor's own `e-no-lazyload` class, so their
+ *              backgrounds load with the stylesheet. Same pictures, nothing restyled;
+ *              a section hidden on the device (display:none) still downloads nothing.
+ *              The homepage's mobile hero picture is also preloaded on phones.
  *              To revert, remove this file and clear the page cache.
- * Version:     1.0.0
+ * Version:     1.1.0
  * Author:      YES Germany
  */
 
@@ -72,4 +83,60 @@ add_action(
 		}
 	},
 	1
+);
+
+/** How many top-level sections, from the top of the page content, keep their background out of lazy loading (1.1.0). */
+const YG_ABOVE_FOLD_EAGER_SECTIONS = 3;
+
+/**
+ * Add Elementor's `e-no-lazyload` class to the first top-level sections of the
+ * page content (1.1.0). Runs on the finished page, before LiteSpeed optimises it.
+ *
+ * @param string $html Finished page.
+ * @return string
+ */
+function yg_above_fold_eager_sections( $html ) {
+	if ( ! is_string( $html ) || false === stripos( $html, '<html' ) ) {
+		return $html;
+	}
+	// The page's own Elementor document, after the header template.
+	if ( ! preg_match( '#data-elementor-type="wp-(?:page|post)"#', $html, $m, PREG_OFFSET_CAPTURE ) ) {
+		return $html;
+	}
+	$start = $m[0][1];
+	$head  = substr( $html, 0, $start );
+	$body  = substr( $html, $start );
+	$body  = preg_replace_callback(
+		'#(<div class=")([^"]*\be-con\b[^"]*\be-parent\b[^"]*)(")#',
+		function ( $c ) {
+			return false !== strpos( $c[2], 'e-no-lazyload' ) ? $c[0] : $c[1] . $c[2] . ' e-no-lazyload' . $c[3];
+		},
+		$body,
+		YG_ABOVE_FOLD_EAGER_SECTIONS
+	);
+	return is_string( $body ) ? $head . $body : $html;
+}
+add_filter( 'litespeed_buffer_before', 'yg_above_fold_eager_sections', 6 );
+
+/**
+ * Homepage, phones: preload the mobile hero's background picture (1.1.0).
+ * Only while the homepage stylesheet still uses that picture, so a new hero
+ * never gets a stale preload.
+ */
+add_action(
+	'wp_head',
+	function () {
+		if ( ! is_front_page() ) {
+			return;
+		}
+		$id  = (int) get_option( 'page_on_front' );
+		$css = wp_upload_dir()['basedir'] . '/elementor/css/post-' . $id . '.css';
+		$src = is_readable( $css ) ? (string) file_get_contents( $css ) : ''; // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		$pic = '/wp-content/uploads/2025/11/Background-1.png';
+		if ( '' === $src || false === strpos( $src, $pic ) || ! is_readable( ABSPATH . ltrim( $pic, '/' ) . '.webp' ) ) {
+			return;
+		}
+		printf( '<link rel="preload" as="image" href="%s" media="(max-width: 767px)" fetchpriority="high">' . "\n", esc_url( home_url( $pic . '.webp' ) ) );
+	},
+	2
 );
