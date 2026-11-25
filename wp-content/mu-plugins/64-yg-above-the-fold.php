@@ -29,8 +29,15 @@
  *              backgrounds load with the stylesheet. Same pictures, nothing restyled;
  *              a section hidden on the device (display:none) still downloads nothing.
  *              The homepage's mobile hero picture is also preloaded on phones.
+ *
+ *              1.2.0 (25 Nov 2026) - layout shift: an upload image with no width/height
+ *              and no srcset (the homepage's India map in the mobile hero) gave the page
+ *              a layout shift of 0.196 when it arrived. Such images now get their file's
+ *              own width and height. Without a srcset the browser already draws them at
+ *              that size, so nothing moves; the space is just reserved before the
+ *              picture loads.
  *              To revert, remove this file and clear the page cache.
- * Version:     1.1.0
+ * Version:     1.2.0
  * Author:      YES Germany
  */
 
@@ -140,3 +147,46 @@ add_action(
 	},
 	2
 );
+
+/**
+ * Give upload images that have no width, height or srcset their file's own
+ * size (1.2.0), so the browser reserves the space before the picture loads.
+ *
+ * @param string $html Finished page.
+ * @return string
+ */
+function yg_above_fold_image_sizes( $html ) {
+	if ( ! is_string( $html ) || false === stripos( $html, '<html' ) ) {
+		return $html;
+	}
+	$uploads = wp_upload_dir();
+	$base    = set_url_scheme( $uploads['baseurl'], 'https' );
+	$dir     = $uploads['basedir'];
+	$done    = 0;
+	$out     = preg_replace_callback(
+		'#<img\b[^>]*>#i',
+		function ( $m ) use ( $base, $dir, &$done ) {
+			$tag = $m[0];
+			if ( $done >= 200 || preg_match( '#\s(?:width|height|srcset|data-srcset|sizes)=#i', $tag ) || ! preg_match( '#\ssrc="([^"]+)"#i', $tag, $src ) ) {
+				return $tag;
+			}
+			$url = set_url_scheme( html_entity_decode( $src[1] ), 'https' );
+			if ( 0 !== strpos( $url, $base . '/' ) ) {
+				return $tag;
+			}
+			$file = $dir . '/' . rawurldecode( strtok( substr( $url, strlen( $base ) + 1 ), '?' ) );
+			if ( false !== strpos( $file, '..' ) || ! is_file( $file ) ) {
+				return $tag;
+			}
+			$size = @getimagesize( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+			if ( ! $size || empty( $size[0] ) || empty( $size[1] ) ) {
+				return $tag;
+			}
+			$done++;
+			return preg_replace( '#^<img\b#i', '<img width="' . (int) $size[0] . '" height="' . (int) $size[1] . '"', $tag );
+		},
+		$html
+	);
+	return is_string( $out ) ? $out : $html;
+}
+add_filter( 'litespeed_buffer_before', 'yg_above_fold_image_sizes', 7 );
